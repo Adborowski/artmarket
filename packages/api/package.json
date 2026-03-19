@@ -1,0 +1,24 @@
+{
+  "name": "@artmarket/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@artmarket/db": "workspace:*",
+    "@trpc/server": "^11.0.0",
+    "superjson": "^2.2.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@artmarket/eslint-config": "workspace:*",
+    "@artmarket/tsconfig": "workspace:*",
+    "typescript": "^5.8.0"
+  }
+}

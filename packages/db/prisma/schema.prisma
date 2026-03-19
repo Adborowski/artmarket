@@ -1,0 +1,224 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")  // Pooled connection (pgBouncer) — for queries
+  directUrl = env("DIRECT_URL")    // Direct connection — for migrations
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum ListingStatus {
+  DRAFT
+  ACTIVE
+  ENDED
+  CANCELLED
+}
+
+enum EscrowStatus {
+  HELD
+  RELEASED
+  DISPUTED
+}
+
+enum PayoutStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+enum DisputeStatus {
+  OPEN
+  RESOLVED
+}
+
+// ---------------------------------------------------------------------------
+// User & Artist
+// ---------------------------------------------------------------------------
+
+// User.id matches Supabase Auth user UUID — no @default, set from auth layer.
+model User {
+  id        String   @id
+  email     String   @unique
+  name      String
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  artist          Artist?
+  bids            Bid[]
+  watchlist       UserWatchlist[]
+  openedDisputes  Dispute[]
+  disputeMessages DisputeMessage[]
+}
+
+// Only exists when a user has registered as an artist.
+model Artist {
+  id                 String             @id @default(cuid())
+  userId             String             @unique
+  user               User               @relation(fields: [userId], references: [id])
+  bio                String?
+  stripeAccountId    String?            // Stripe Connect Express account ID
+  verificationStatus VerificationStatus @default(PENDING)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  artworks Artwork[]
+  payouts  Payout[]
+}
+
+// ---------------------------------------------------------------------------
+// Artwork
+// ---------------------------------------------------------------------------
+
+model Artwork {
+  id          String   @id @default(cuid())
+  artistId    String
+  artist      Artist   @relation(fields: [artistId], references: [id])
+  title       String
+  description String?
+  medium      String?  // e.g. "oil on canvas"
+  dimensions  String?  // e.g. "40 × 60 cm"
+  year        Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  photos   ArtworkPhoto[]
+  listings AuctionListing[]
+}
+
+model ArtworkPhoto {
+  id          String  @id @default(cuid())
+  artworkId   String
+  artwork     Artwork @relation(fields: [artworkId], references: [id])
+  storagePath String  // Supabase Storage object key
+  order       Int
+  isPrimary   Boolean @default(false)
+}
+
+// ---------------------------------------------------------------------------
+// Auction Listing & Bids
+// ---------------------------------------------------------------------------
+
+model AuctionListing {
+  id            String        @id @default(cuid())
+  artworkId     String
+  artwork       Artwork       @relation(fields: [artworkId], references: [id])
+  status        ListingStatus @default(DRAFT)
+  startPrice    Decimal       @db.Decimal(10, 2) // PLN
+  reservePrice  Decimal?      @db.Decimal(10, 2)
+  buyItNowPrice Decimal?      @db.Decimal(10, 2)
+  startsAt      DateTime
+  endsAt        DateTime      // scheduled close
+  closedAt      DateTime?     // actual close (may differ if closed early)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Set when auction ends; also reflected by isWinning flag on the Bid row.
+  winningBidId String? @unique
+  winningBid   Bid?    @relation("WinningBid", fields: [winningBidId], references: [id])
+
+  bids          Bid[]           @relation("ListingBids")
+  watchedBy     UserWatchlist[]
+  escrowPayment EscrowPayment?
+}
+
+model Bid {
+  id        String         @id @default(cuid())
+  listingId String
+  listing   AuctionListing @relation("ListingBids", fields: [listingId], references: [id])
+  bidderId  String
+  bidder    User           @relation(fields: [bidderId], references: [id])
+  amount    Decimal        @db.Decimal(10, 2)
+  isWinning Boolean        @default(false)
+  createdAt DateTime       @default(now())
+
+  wonListing AuctionListing? @relation("WinningBid")
+}
+
+// ---------------------------------------------------------------------------
+// Watchlist
+// ---------------------------------------------------------------------------
+
+model UserWatchlist {
+  userId    String
+  user      User           @relation(fields: [userId], references: [id])
+  listingId String
+  listing   AuctionListing @relation(fields: [listingId], references: [id])
+  createdAt DateTime       @default(now())
+
+  @@id([userId, listingId])
+}
+
+// ---------------------------------------------------------------------------
+// Payments & Escrow
+// ---------------------------------------------------------------------------
+
+model EscrowPayment {
+  id                 String         @id @default(cuid())
+  listingId          String         @unique
+  listing            AuctionListing @relation(fields: [listingId], references: [id])
+  stripePaymentId    String         // Stripe PaymentIntent ID
+  amount             Decimal        @db.Decimal(10, 2)
+  commissionAmount   Decimal        @db.Decimal(10, 2) // platform fee
+  status             EscrowStatus   @default(HELD)
+  releaseScheduledAt DateTime?      // set to closedAt + 14 days; cleared if disputed
+  releasedAt         DateTime?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  payout  Payout?
+  dispute Dispute?
+}
+
+model Payout {
+  id               String        @id @default(cuid())
+  artistId         String
+  artist           Artist        @relation(fields: [artistId], references: [id])
+  escrowPaymentId  String        @unique
+  escrowPayment    EscrowPayment @relation(fields: [escrowPaymentId], references: [id])
+  stripeTransferId String?       // Stripe Transfer ID, set once transfer is made
+  amount           Decimal       @db.Decimal(10, 2)
+  status           PayoutStatus  @default(PENDING)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Disputes
+// ---------------------------------------------------------------------------
+
+model Dispute {
+  id              String        @id @default(cuid())
+  escrowPaymentId String        @unique
+  escrowPayment   EscrowPayment @relation(fields: [escrowPaymentId], references: [id])
+  openedById      String
+  openedBy        User          @relation(fields: [openedById], references: [id])
+  status          DisputeStatus @default(OPEN)
+  resolvedAt      DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  messages DisputeMessage[]
+}
+
+// Subscribable via Supabase Realtime for live chat on the dispute screen.
+model DisputeMessage {
+  id        String   @id @default(cuid())
+  disputeId String
+  dispute   Dispute  @relation(fields: [disputeId], references: [id])
+  senderId  String
+  sender    User     @relation(fields: [senderId], references: [id])
+  body      String
+  createdAt DateTime @default(now())
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@artmarket/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "db:seed": "bun prisma/seed.ts",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.5.0",
+    "@supabase/supabase-js": "^2.49.0"
+  },
+  "devDependencies": {
+    "@artmarket/eslint-config": "workspace:*",
+    "@artmarket/tsconfig": "workspace:*",
+    "@types/pg": "^8.18.0",
+    "dotenv": "^16.0.0",
+    "pg": "^8.20.0",
+    "prisma": "^6.5.0",
+    "typescript": "^5.8.0"
+  }
+}

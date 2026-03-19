@@ -1,0 +1,46 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+.next
+dist
+out
+.expo
+.turbo
+
+# Generated
+.prisma
+prisma/generated
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Supabase
+.branches
+.temp
+
+# OS
+.DS_Store
+*.pem
+Thumbs.db
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# Bun
+bun.lockb
+
+# Expo
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
