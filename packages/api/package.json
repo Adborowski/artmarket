@@ -19,6 +19,7 @@
   "devDependencies": {
     "@artmarket/eslint-config": "workspace:*",
     "@artmarket/tsconfig": "workspace:*",
+    "@types/node": "^25.5.0",
     "typescript": "^5.8.0"
   }
 }

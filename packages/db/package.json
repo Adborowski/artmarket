@@ -22,6 +22,7 @@
   "devDependencies": {
     "@artmarket/eslint-config": "workspace:*",
     "@artmarket/tsconfig": "workspace:*",
+    "@types/node": "^25.5.0",
     "@types/pg": "^8.18.0",
     "dotenv": "^16.0.0",
     "pg": "^8.20.0",

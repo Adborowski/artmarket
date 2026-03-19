@@ -100,7 +100,7 @@ model Artwork {
 model ArtworkPhoto {
   id          String  @id @default(cuid())
   artworkId   String
-  artwork     Artwork @relation(fields: [artworkId], references: [id])
+  artwork     Artwork @relation(fields: [artworkId], references: [id], onDelete: Cascade)
   storagePath String  // Supabase Storage object key
   order       Int
   isPrimary   Boolean @default(false)
@@ -113,7 +113,7 @@ model ArtworkPhoto {
 model AuctionListing {
   id            String        @id @default(cuid())
   artworkId     String
-  artwork       Artwork       @relation(fields: [artworkId], references: [id])
+  artwork       Artwork       @relation(fields: [artworkId], references: [id], onDelete: Cascade)
   status        ListingStatus @default(DRAFT)
   startPrice    Decimal       @db.Decimal(10, 2) // PLN
   reservePrice  Decimal?      @db.Decimal(10, 2)

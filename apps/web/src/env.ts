@@ -7,14 +7,16 @@ export const env = createEnv({
     DATABASE_URL: z.string().url(),
     DIRECT_URL: z.string().url(),
     SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
-    STRIPE_SECRET_KEY: z.string().startsWith('sk_'),
-    STRIPE_WEBHOOK_SECRET: z.string().startsWith('whsec_'),
-    RESEND_API_KEY: z.string().startsWith('re_'),
+    // Phase 2 — required once payments / email are wired up
+    STRIPE_SECRET_KEY: z.string().startsWith('sk_').optional(),
+    STRIPE_WEBHOOK_SECRET: z.string().startsWith('whsec_').optional(),
+    RESEND_API_KEY: z.string().startsWith('re_').optional(),
   },
   client: {
     NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
     NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().startsWith('pk_'),
+    // Phase 2
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().startsWith('pk_').optional(),
   },
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,

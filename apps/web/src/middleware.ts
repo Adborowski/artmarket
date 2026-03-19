@@ -1,9 +1,18 @@
 import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+import createIntlMiddleware from 'next-intl/middleware'
+import { type NextRequest, NextResponse } from 'next/server'
+import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies'
+import { routing } from './i18n/routing'
+
+type CookieToSet = { name: string; value: string; options?: Partial<ResponseCookie> }
+
+const handleI18n = createIntlMiddleware(routing)
 
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request })
+  // 1. Handle locale routing (detects locale, redirects / → /pl, etc.)
+  let response = handleI18n(request) ?? NextResponse.next({ request })
 
+  // 2. Refresh Supabase session on every request, preserving the i18n response.
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -12,26 +21,23 @@ export async function middleware(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: CookieToSet[]) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options),
+            options ? response.cookies.set(name, value, options) : response.cookies.set(name, value),
           )
         },
       },
     },
   )
 
-  // Refreshes the session cookie if expired. Must not run any logic before this.
-  await supabase.auth.getUser()
+  await supabase.auth.getSession()
 
-  return supabaseResponse
+  return response
 }
 
 export const config = {
   matcher: [
-    // Skip static files and Next.js internals; run on everything else.
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

@@ -1,0 +1,114 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "back": "Back"
+  },
+  "nav": {
+    "explore": "Explore",
+    "sell": "Sell",
+    "myBids": "My bids",
+    "profile": "Profile",
+    "myArtworks": "My artworks",
+    "signIn": "Sign in",
+    "signOut": "Sign out"
+  },
+  "auth": {
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "signIn": {
+      "title": "Sign in",
+      "submit": "Sign in",
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign up",
+      "error": "Invalid email or password."
+    },
+    "signUp": {
+      "title": "Create account",
+      "submit": "Create account",
+      "hasAccount": "Already have an account?",
+      "signInLink": "Sign in",
+      "error": "Could not create account. Please try again."
+    }
+  },
+  "artist": {
+    "register": {
+      "title": "Become an artist",
+      "description": "Create an artist profile to list your original artwork for auction.",
+      "bio": "Bio",
+      "bioPlaceholder": "Tell buyers about yourself and your practice...",
+      "submit": "Create artist profile",
+      "error": "Registration failed. Please try again.",
+      "alreadyArtist": "You already have an artist profile."
+    }
+  },
+  "artwork": {
+    "new": {
+      "title": "Add artwork",
+      "artworkTitle": "Title",
+      "medium": "Medium",
+      "mediumPlaceholder": "e.g. oil on canvas",
+      "dimensions": "Dimensions",
+      "dimensionsPlaceholder": "e.g. 40 × 60 cm",
+      "year": "Year",
+      "description": "Description",
+      "photos": "Photos",
+      "photosHint": "Upload at least one photo. The first photo will be used as the primary image.",
+      "addPhotos": "Select photos",
+      "setPrimary": "Set primary",
+      "removePhoto": "Remove",
+      "primaryBadge": "Primary",
+      "submit": "Save artwork",
+      "error": "Failed to save artwork. Please try again.",
+      "uploadError": "Photo upload failed. Please try again."
+    },
+    "list": {
+      "title": "My artworks",
+      "empty": "You haven't added any artworks yet.",
+      "addNew": "Add artwork",
+      "primaryPhoto": "Primary photo"
+    },
+    "detail": {
+      "startingPrice": "Starting price",
+      "placeBid": "Place bid",
+      "by": "by",
+      "notFound": "Artwork not found.",
+      "delete": "Delete artwork",
+      "startAuction": "Start auction",
+      "auctionInProgress": "Auction in progress",
+      "viewAuction": "View auction"
+    }
+  },
+  "listing": {
+    "new": {
+      "title": "Start auction",
+      "startPrice": "Starting price (PLN)",
+      "reservePrice": "Reserve price (PLN, optional)",
+      "duration": "Duration",
+      "duration7": "7 days",
+      "duration14": "14 days",
+      "duration30": "30 days",
+      "submit": "Start auction",
+      "error": "Failed to create listing. Please try again."
+    },
+    "detail": {
+      "currentBid": "Current bid",
+      "startingAt": "Starting at",
+      "reserveMet": "Reserve met",
+      "reserveNotMet": "Reserve not met",
+      "timeLeft": "Time left",
+      "ended": "Auction ended",
+      "winner": "Winner",
+      "noBids": "No bids yet",
+      "placeBid": "Place bid",
+      "minimumBid": "Minimum bid",
+      "yourBid": "Your bid (PLN)",
+      "submit": "Bid",
+      "ownArtwork": "You cannot bid on your own artwork",
+      "signInToBid": "Sign in to bid",
+      "bids": "Bids",
+      "realtimeNote": "Enable Realtime on the Bid table in Supabase dashboard for live updates."
+    }
+  }
+}

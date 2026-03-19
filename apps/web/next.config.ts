@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next'
 import createNextIntlPlugin from 'next-intl/plugin'
 
-const withNextIntl = createNextIntlPlugin()
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
 const config: NextConfig = {
   transpilePackages: ['@artmarket/api', '@artmarket/db', '@artmarket/i18n', '@artmarket/types'],

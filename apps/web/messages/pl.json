@@ -1,0 +1,114 @@
+{
+  "common": {
+    "loading": "Ładowanie...",
+    "error": "Coś poszło nie tak",
+    "back": "Wróć"
+  },
+  "nav": {
+    "explore": "Odkryj",
+    "sell": "Sprzedaj",
+    "myBids": "Moje licytacje",
+    "profile": "Profil",
+    "myArtworks": "Moje prace",
+    "signIn": "Zaloguj się",
+    "signOut": "Wyloguj się"
+  },
+  "auth": {
+    "email": "Email",
+    "emailPlaceholder": "ty@example.com",
+    "password": "Hasło",
+    "signIn": {
+      "title": "Zaloguj się",
+      "submit": "Zaloguj się",
+      "noAccount": "Nie masz konta?",
+      "signUpLink": "Zarejestruj się",
+      "error": "Nieprawidłowy email lub hasło."
+    },
+    "signUp": {
+      "title": "Utwórz konto",
+      "submit": "Utwórz konto",
+      "hasAccount": "Masz już konto?",
+      "signInLink": "Zaloguj się",
+      "error": "Nie udało się utworzyć konta. Spróbuj ponownie."
+    }
+  },
+  "artist": {
+    "register": {
+      "title": "Zostań artystą",
+      "description": "Utwórz profil artysty, aby wystawiać oryginalne prace na aukcję.",
+      "bio": "Bio",
+      "bioPlaceholder": "Opowiedz kupującym o sobie i swojej twórczości...",
+      "submit": "Utwórz profil artysty",
+      "error": "Rejestracja nie powiodła się. Spróbuj ponownie.",
+      "alreadyArtist": "Masz już profil artysty."
+    }
+  },
+  "artwork": {
+    "new": {
+      "title": "Dodaj pracę",
+      "artworkTitle": "Tytuł",
+      "medium": "Technika",
+      "mediumPlaceholder": "np. olej na płótnie",
+      "dimensions": "Wymiary",
+      "dimensionsPlaceholder": "np. 40 × 60 cm",
+      "year": "Rok",
+      "description": "Opis",
+      "photos": "Zdjęcia",
+      "photosHint": "Dodaj co najmniej jedno zdjęcie. Pierwsze zdjęcie będzie zdjęciem głównym.",
+      "addPhotos": "Wybierz zdjęcia",
+      "setPrimary": "Ustaw jako główne",
+      "removePhoto": "Usuń",
+      "primaryBadge": "Główne",
+      "submit": "Zapisz pracę",
+      "error": "Nie udało się zapisać pracy. Spróbuj ponownie.",
+      "uploadError": "Przesyłanie zdjęcia nie powiodło się. Spróbuj ponownie."
+    },
+    "list": {
+      "title": "Moje prace",
+      "empty": "Nie dodałeś jeszcze żadnych prac.",
+      "addNew": "Dodaj pracę",
+      "primaryPhoto": "Zdjęcie główne"
+    },
+    "detail": {
+      "startingPrice": "Cena wywoławcza",
+      "placeBid": "Licytuj",
+      "by": "autor",
+      "notFound": "Nie znaleziono pracy.",
+      "delete": "Usuń pracę",
+      "startAuction": "Wystaw na aukcję",
+      "auctionInProgress": "Aukcja w toku",
+      "viewAuction": "Zobacz aukcję"
+    }
+  },
+  "listing": {
+    "new": {
+      "title": "Utwórz aukcję",
+      "startPrice": "Cena wywoławcza (PLN)",
+      "reservePrice": "Cena minimalna (PLN, opcjonalnie)",
+      "duration": "Czas trwania",
+      "duration7": "7 dni",
+      "duration14": "14 dni",
+      "duration30": "30 dni",
+      "submit": "Wystaw na aukcję",
+      "error": "Nie udało się utworzyć aukcji. Spróbuj ponownie."
+    },
+    "detail": {
+      "currentBid": "Aktualna oferta",
+      "startingAt": "Cena wywoławcza",
+      "reserveMet": "Cena minimalna osiągnięta",
+      "reserveNotMet": "Cena minimalna nie osiągnięta",
+      "timeLeft": "Pozostały czas",
+      "ended": "Aukcja zakończona",
+      "winner": "Zwycięzca",
+      "noBids": "Brak ofert",
+      "placeBid": "Złóż ofertę",
+      "minimumBid": "Minimalna oferta",
+      "yourBid": "Twoja oferta (PLN)",
+      "submit": "Licytuj",
+      "ownArtwork": "Nie możesz licytować własnej pracy",
+      "signInToBid": "Zaloguj się, aby licytować",
+      "bids": "Oferty",
+      "realtimeNote": "Włącz Realtime dla tabeli Bid w panelu Supabase, aby otrzymywać aktualizacje na żywo."
+    }
+  }
+}
