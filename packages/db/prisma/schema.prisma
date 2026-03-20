@@ -55,11 +55,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  artist          Artist?
-  bids            Bid[]
-  watchlist       UserWatchlist[]
-  openedDisputes  Dispute[]
-  disputeMessages DisputeMessage[]
+  artist           Artist?
+  bids             Bid[]
+  watchlist        UserWatchlist[]
+  openedDisputes   Dispute[]
+  disputeMessages  DisputeMessage[]
+  artworkInterests ArtworkInterest[]
 }
 
 // Only exists when a user has registered as an artist.
@@ -68,6 +69,7 @@ model Artist {
   userId             String             @unique
   user               User               @relation(fields: [userId], references: [id])
   bio                String?
+  coverUrl           String?            // Profile cover / banner photo
   stripeAccountId    String?            // Stripe Connect Express account ID
   verificationStatus VerificationStatus @default(PENDING)
   createdAt          DateTime           @default(now())
@@ -93,8 +95,19 @@ model Artwork {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  photos   ArtworkPhoto[]
-  listings AuctionListing[]
+  photos    ArtworkPhoto[]
+  listings  AuctionListing[]
+  interests ArtworkInterest[]
+}
+
+model ArtworkInterest {
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  artworkId String
+  artwork   Artwork @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, artworkId])
 }
 
 model ArtworkPhoto {
