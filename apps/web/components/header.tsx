@@ -3,6 +3,7 @@ import { Link } from '@/src/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { signOut } from '@/src/lib/auth/actions'
 import { getSessionUser, getArtist } from '@/src/lib/data'
+import { NavigationIndicator } from '@/components/navigation-indicator'
 
 export async function Header({ locale }: { locale: string }) {
   const user = await getSessionUser()
@@ -18,9 +19,12 @@ export async function Header({ locale }: { locale: string }) {
   return (
     <header className="border-b">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-        <Link href="/" className="font-semibold">
-          Artmarket
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/" className="font-semibold">
+            Artmarket
+          </Link>
+          <NavigationIndicator />
+        </div>
         {user ? (
           <div className="flex items-center gap-2">
             {isArtist && (
