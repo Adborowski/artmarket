@@ -27,6 +27,7 @@
   --radius-xl: calc(var(--radius) + 4px);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-basteleur: var(--font-basteleur);
 }
 
 :root {
@@ -78,5 +79,9 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  h1, h2 {
+    font-family: var(--font-basteleur), serif;
+    font-weight: 700;
   }
 }

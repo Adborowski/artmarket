@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../generated/client"
 }
 
 datasource db {
@@ -48,12 +49,14 @@ enum DisputeStatus {
 
 // User.id matches Supabase Auth user UUID — no @default, set from auth layer.
 model User {
-  id        String   @id
-  email     String   @unique
-  name      String
-  avatarUrl String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                     String   @id
+  email                  String   @unique
+  name                   String
+  avatarUrl              String?
+  stripeCustomerId       String?  // Stripe Customer ID for card-on-file
+  stripePaymentMethodId  String?  // Default saved payment method
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 
   artist           Artist?
   bids             Bid[]
@@ -70,7 +73,7 @@ model Artist {
   user               User               @relation(fields: [userId], references: [id])
   bio                String?
   coverUrl           String?            // Profile cover / banner photo
-  stripeAccountId    String?            // Stripe Connect Express account ID
+  ibanNumber         String?            // Artist's IBAN for manual payouts
   verificationStatus VerificationStatus @default(PENDING)
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt

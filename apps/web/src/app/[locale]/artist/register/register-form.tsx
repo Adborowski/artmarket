@@ -9,11 +9,19 @@ import { useRouter } from '@/src/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { trpc } from '@/src/lib/trpc/client'
 
+const ibanRegex = /^[A-Z]{2}\d{2}[A-Z0-9]+$/
+
 const schema = z.object({
   bio: z.string().max(1000).optional(),
+  ibanNumber: z.string()
+    .min(15)
+    .max(34)
+    .transform((v) => v.replace(/\s+/g, '').toUpperCase())
+    .pipe(z.string().regex(ibanRegex, 'Invalid IBAN format')),
 })
 
 type Values = z.infer<typeof schema>
@@ -33,12 +41,12 @@ export function RegisterArtistForm() {
 
   const form = useForm<Values>({
     resolver: standardSchemaResolver(schema),
-    defaultValues: { bio: '' },
+    defaultValues: { bio: '', ibanNumber: '' },
   })
 
   function onSubmit(values: Values) {
     setServerError(null)
-    register.mutate({ bio: values.bio || undefined })
+    register.mutate({ bio: values.bio || undefined, ibanNumber: values.ibanNumber })
   }
 
   return (
@@ -60,6 +68,22 @@ export function RegisterArtistForm() {
                     <Textarea
                       placeholder={t('bioPlaceholder')}
                       rows={4}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="ibanNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('ibanNumber')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t('ibanPlaceholder')}
                       {...field}
                     />
                   </FormControl>

@@ -5,6 +5,24 @@ import { redirect } from '@/src/i18n/navigation'
 import { getSessionUser } from '@/src/lib/data'
 import { db } from '@artmarket/db'
 
+export async function toggleInterest(artworkId: string): Promise<{ interested: boolean; count: number }> {
+  const user = await getSessionUser()
+  if (!user) throw new Error('Unauthorized')
+
+  const existing = await db.artworkInterest.findUnique({
+    where: { userId_artworkId: { userId: user.id, artworkId } },
+  })
+
+  if (existing) {
+    await db.artworkInterest.delete({ where: { userId_artworkId: { userId: user.id, artworkId } } })
+  } else {
+    await db.artworkInterest.create({ data: { userId: user.id, artworkId } })
+  }
+
+  const count = await db.artworkInterest.count({ where: { artworkId } })
+  return { interested: !existing, count }
+}
+
 export async function deleteArtwork(artworkId: string, locale: string) {
   const user = await getSessionUser()
   if (!user) redirect({ href: '/auth/sign-in', locale })

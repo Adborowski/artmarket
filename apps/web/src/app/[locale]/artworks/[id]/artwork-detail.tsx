@@ -3,18 +3,17 @@ import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/src/i18n/navigation'
 import { Button } from '@/components/ui/button'
-import { getArtworkById, getSessionUser } from '@/src/lib/data'
+import { getArtworkById, getSessionUser, getArtworkInterestForUser } from '@/src/lib/data'
 import { deleteArtwork } from '@/src/lib/artwork/actions'
 import { DeleteArtworkButton } from '@/components/delete-artwork-button'
-
-function priceFromId(id: string): number {
-  const hash = id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
-  return (8 + (hash % 117)) * 100
-}
+import { ArtistBanner } from '@/components/artist-banner'
+import { InterestedButton } from '@/components/interested-button'
+import { getInstitutionByEmail } from '@artmarket/institutions'
 
 export async function ArtworkDetail({ id, locale }: { id: string; locale: string }) {
-  const [t, artwork, user] = await Promise.all([
+  const [t, tArtists, artwork, user] = await Promise.all([
     getTranslations('artwork.detail'),
+    getTranslations('artists'),
     getArtworkById(id),
     getSessionUser(),
   ])
@@ -24,8 +23,8 @@ export async function ArtworkDetail({ id, locale }: { id: string; locale: string
   const isOwner = user?.id === artwork.artist.userId
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const primaryPhoto = artwork.photos.find((p) => p.isPrimary) ?? artwork.photos[0]
-  const price = priceFromId(artwork.id)
   const activeListing = artwork.listings?.[0] ?? null
+  const userInterested = user && !isOwner ? await getArtworkInterestForUser(artwork.id, user.id) : false
 
   return (
     <div className="grid gap-10 md:grid-cols-2">
@@ -93,14 +92,15 @@ export async function ArtworkDetail({ id, locale }: { id: string; locale: string
           <p className="text-sm leading-relaxed text-muted-foreground">{artwork.description}</p>
         )}
 
-        {artwork.artist.bio && (
-          <div className="border-t pt-4">
-            <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {artwork.artist.user.name}
-            </p>
-            <p className="text-sm leading-relaxed text-muted-foreground">{artwork.artist.bio}</p>
-          </div>
-        )}
+        <div className="border-t pt-4">
+          <ArtistBanner
+            artistId={artwork.artist.id}
+            name={artwork.artist.user.name}
+            avatarUrl={artwork.artist.user.avatarUrl}
+            institution={getInstitutionByEmail(artwork.artist.user.email)}
+            viewProfileLabel={tArtists('viewProfile')}
+          />
+        </div>
 
         <div className="border-t pt-4">
           {isOwner ? (
@@ -126,17 +126,24 @@ export async function ArtworkDetail({ id, locale }: { id: string; locale: string
             </div>
           ) : (
             <div className="space-y-3">
-              <p className="text-xs text-muted-foreground">{t('startingPrice')}</p>
-              <p className="mt-1 text-2xl font-bold">{price.toLocaleString('pl-PL')} PLN</p>
-              {activeListing ? (
+              {activeListing && (
                 <Button asChild className="w-full" size="lg">
                   <Link href={`/listings/${activeListing.id}`}>{t('placeBid')}</Link>
                 </Button>
-              ) : (
-                <Button className="w-full" size="lg" disabled>
-                  {t('placeBid')}
-                </Button>
               )}
+              <InterestedButton
+                artworkId={artwork.id}
+                initialInterested={!!userInterested}
+                initialCount={artwork._count.interests}
+                label={t('interested')}
+                signInHref={`/${locale}/auth/sign-in`}
+                isLoggedIn={!!user}
+              />
+              <Button asChild variant="outline" className="w-full" size="lg">
+                <a href={`mailto:${artwork.artist.user.email}?subject=${encodeURIComponent(t('contactSubject', { title: artwork.title }))}`}>
+                  {t('contactArtist')}
+                </a>
+              </Button>
             </div>
           )}
         </div>

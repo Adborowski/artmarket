@@ -4,12 +4,14 @@ import { Button } from '@/components/ui/button'
 import { signOut } from '@/src/lib/auth/actions'
 import { getSessionUser, getArtist } from '@/src/lib/data'
 import { NavigationIndicator } from '@/components/navigation-indicator'
+import { FeedbackModal } from '@/components/feedback-modal'
 
 export async function Header({ locale }: { locale: string }) {
   const user = await getSessionUser()
 
-  const [t, artist] = await Promise.all([
+  const [t, tFeedback, artist] = await Promise.all([
     getTranslations('nav'),
+    getTranslations('feedback'),
     user ? getArtist(user.id) : Promise.resolve(null),
   ])
   const isArtist = !!artist
@@ -20,13 +22,16 @@ export async function Header({ locale }: { locale: string }) {
     <header className="border-b">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
         <div className="flex items-center gap-2">
-          <Link href="/" className="font-semibold">
+          <Link href="/" className="font-basteleur text-lg tracking-wide">
             Artmarket
           </Link>
           <NavigationIndicator />
         </div>
         {user ? (
           <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/artists">{t('artists')}</Link>
+            </Button>
             {isArtist && (
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/artworks">{t('myArtworks')}</Link>
@@ -35,6 +40,7 @@ export async function Header({ locale }: { locale: string }) {
             <Button variant="ghost" size="sm" asChild>
               <Link href="/artworks/new">{t('sell')}</Link>
             </Button>
+            <FeedbackModal trigger={<Button variant="ghost" size="sm">{tFeedback('trigger')}</Button>} />
             <form action={signOutAction}>
               <Button variant="ghost" size="sm" type="submit">
                 {t('signOut')}
@@ -42,9 +48,15 @@ export async function Header({ locale }: { locale: string }) {
             </form>
           </div>
         ) : (
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/auth/sign-in">{t('signIn')}</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/artists">{t('artists')}</Link>
+            </Button>
+            <FeedbackModal trigger={<Button variant="ghost" size="sm">{tFeedback('trigger')}</Button>} />
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/auth/sign-in">{t('signIn')}</Link>
+            </Button>
+          </div>
         )}
       </div>
     </header>

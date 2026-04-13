@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server'
 import { redirect, Link } from '@/src/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { getArtistWithArtworks } from '@/src/lib/data'
+import { HeartIcon } from '@/components/heart-icon'
 
 export async function ArtworkList({ userId, locale }: { userId: string; locale: string }) {
   const [t, artist] = await Promise.all([
@@ -54,9 +55,19 @@ export async function ArtworkList({ userId, locale }: { userId: string; locale: 
                 </div>
                 <div className="p-3">
                   <p className="truncate text-sm font-medium">{artwork.title}</p>
-                  {artwork.year && (
-                    <p className="text-xs text-muted-foreground">{artwork.year}</p>
-                  )}
+                  <div className="mt-0.5 flex items-center justify-between gap-1">
+                    {artwork.year ? (
+                      <p className="text-xs text-muted-foreground">{artwork.year}</p>
+                    ) : (
+                      <span />
+                    )}
+                    {artwork._count.interests > 0 && (
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <HeartIcon />
+                        {artwork._count.interests}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </Link>
             )

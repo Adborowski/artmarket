@@ -4,10 +4,13 @@ import { getTranslations } from 'next-intl/server'
 import { db } from '@artmarket/db'
 import { getSessionUser } from '@/src/lib/data'
 import { BidPanel } from './bid-panel'
+import { ArtistBanner } from '@/components/artist-banner'
+import { getInstitutionByEmail } from '@artmarket/institutions'
 
 export async function ListingDetail({ id }: { id: string }) {
-  const [t, user] = await Promise.all([
+  const [t, tArtists, user] = await Promise.all([
     getTranslations('listing.detail'),
+    getTranslations('artists'),
     getSessionUser(),
   ])
 
@@ -30,8 +33,9 @@ export async function ListingDetail({ id }: { id: string }) {
           year: true,
           artist: {
             select: {
+              id: true,
               userId: true,
-              user: { select: { name: true } },
+              user: { select: { name: true, avatarUrl: true, email: true } },
             },
           },
           photos: {
@@ -46,6 +50,7 @@ export async function ListingDetail({ id }: { id: string }) {
         take: 20,
         select: {
           id: true,
+          bidderId: true,
           amount: true,
           createdAt: true,
           isWinning: true,
@@ -88,6 +93,7 @@ export async function ListingDetail({ id }: { id: string }) {
   }
   const initialBids = listing.bids.map((b) => ({
     id: b.id,
+    bidderId: b.bidderId,
     amount: Number(b.amount),
     createdAt: b.createdAt.toISOString(),
     isWinning: b.isWinning,
@@ -114,8 +120,7 @@ export async function ListingDetail({ id }: { id: string }) {
           </div>
         )}
         <div className="mt-4">
-          <p className="text-sm text-muted-foreground">{listing.artwork.artist.user.name}</p>
-          <h1 className="mt-1 text-2xl font-bold">{listing.artwork.title}</h1>
+          <h1 className="text-2xl font-bold">{listing.artwork.title}</h1>
           <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
             {listing.artwork.medium && (
               <><dt className="text-muted-foreground">Medium</dt><dd>{listing.artwork.medium}</dd></>
@@ -127,6 +132,15 @@ export async function ListingDetail({ id }: { id: string }) {
               <><dt className="text-muted-foreground">Year</dt><dd>{listing.artwork.year}</dd></>
             )}
           </dl>
+          <div className="mt-4">
+            <ArtistBanner
+              artistId={listing.artwork.artist.id}
+              name={listing.artwork.artist.user.name}
+              avatarUrl={listing.artwork.artist.user.avatarUrl}
+              institution={getInstitutionByEmail(listing.artwork.artist.user.email)}
+              viewProfileLabel={tArtists('viewProfile')}
+            />
+          </div>
         </div>
       </div>
 

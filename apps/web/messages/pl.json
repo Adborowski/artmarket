@@ -4,8 +4,25 @@
     "error": "Coś poszło nie tak",
     "back": "Wróć"
   },
+  "home": {
+    "liveAuctions": "Aukcje na żywo",
+    "explore": "Odkryj"
+  },
+  "artists": {
+    "title": "Artyści",
+    "featured": "Wyróżniony artysta",
+    "viewProfile": "Zobacz profil",
+    "artworksCount": "{count} prac",
+    "noArtists": "Brak artystów.",
+    "changePhoto": "Zmień zdjęcie",
+    "changeCover": "Zmień okładkę",
+    "uploadError": "Przesyłanie nie powiodło się. Spróbuj ponownie.",
+    "contactArtist": "Napisz do artysty",
+    "contactSubject": "Zapytanie — Artmarket"
+  },
   "nav": {
     "explore": "Odkryj",
+    "artists": "Artyści",
     "sell": "Sprzedaj",
     "myBids": "Moje licytacje",
     "profile": "Profil",
@@ -38,6 +55,8 @@
       "description": "Utwórz profil artysty, aby wystawiać oryginalne prace na aukcję.",
       "bio": "Bio",
       "bioPlaceholder": "Opowiedz kupującym o sobie i swojej twórczości...",
+      "ibanNumber": "IBAN (do wypłat)",
+      "ibanPlaceholder": "PL61 1090 1014 0000 0712 1981 2874",
       "submit": "Utwórz profil artysty",
       "error": "Rejestracja nie powiodła się. Spróbuj ponownie.",
       "alreadyArtist": "Masz już profil artysty."
@@ -70,17 +89,49 @@
       "primaryPhoto": "Zdjęcie główne"
     },
     "detail": {
-      "startingPrice": "Cena wywoławcza",
       "placeBid": "Licytuj",
       "by": "autor",
       "notFound": "Nie znaleziono pracy.",
       "delete": "Usuń pracę",
       "startAuction": "Wystaw na aukcję",
       "auctionInProgress": "Aukcja w toku",
-      "viewAuction": "Zobacz aukcję"
+      "viewAuction": "Zobacz aukcję",
+      "interested": "Jestem zainteresowany/a",
+      "contactArtist": "Napisz do artysty",
+      "contactSubject": "Zapytanie o pracę: {title}"
     }
   },
+  "billing": {
+    "cardPrompt": "Dodaj kartę, aby licytować. Płatność zostanie pobrana tylko jeśli wygrasz.",
+    "saveCard": "Zapisz kartę",
+    "saving": "Zapisywanie...",
+    "cardError": "Nie udało się zapisać karty. Spróbuj ponownie.",
+    "savedCard": "Karta zapisana",
+    "changeCard": "Zmień kartę"
+  },
+  "feedback": {
+    "title": "Zgłoszenie",
+    "typeProblem": "Zgłoś problem",
+    "typeFeature": "Zaproponuj funkcję",
+    "subject": "Temat",
+    "description": "Opis",
+    "email": "Twój email",
+    "send": "Wyślij",
+    "sending": "Wysyłanie...",
+    "cancel": "Anuluj",
+    "error": "Coś poszło nie tak. Spróbuj ponownie.",
+    "successTitle": "Dziękujemy!",
+    "successBody": "Otrzymaliśmy Twoją wiadomość i odpowiemy, jeśli będzie to konieczne.",
+    "close": "Zamknij",
+    "trigger": "Zgłoś / Zaproponuj"
+  },
   "listing": {
+    "card": {
+      "currentBid": "Aktualna oferta",
+      "startingAt": "Cena wywoławcza",
+      "live": "Na żywo",
+      "ending": "Kończy się"
+    },
     "new": {
       "title": "Utwórz aukcję",
       "startPrice": "Cena wywoławcza (PLN)",
@@ -107,6 +158,7 @@
       "submit": "Licytuj",
       "ownArtwork": "Nie możesz licytować własnej pracy",
       "signInToBid": "Zaloguj się, aby licytować",
+      "youAreTopBidder": "Twoja oferta jest najwyższa",
       "bids": "Oferty",
       "realtimeNote": "Włącz Realtime dla tabeli Bid w panelu Supabase, aby otrzymywać aktualizacje na żywo."
     }

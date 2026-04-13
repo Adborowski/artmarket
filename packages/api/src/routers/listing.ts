@@ -59,6 +59,9 @@ export const listingRouter = createTRPCRouter({
       if (new Date() > listing.endsAt) throw new TRPCError({ code: 'BAD_REQUEST', message: 'Auction has ended' })
       if (listing.artwork.artist.userId === ctx.userId) throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot bid on your own artwork' })
 
+      const bidder = await db.user.findUnique({ where: { id: ctx.userId }, select: { stripePaymentMethodId: true } })
+      if (!bidder?.stripePaymentMethodId) throw new TRPCError({ code: 'BAD_REQUEST', message: 'A saved payment method is required to bid' })
+
       const highest = listing.bids[0]
       const minimumBid = highest ? Number(highest.amount) + MIN_INCREMENT : Number(listing.startPrice)
       if (input.amount < minimumBid) throw new TRPCError({ code: 'BAD_REQUEST', message: `Minimum bid is ${minimumBid} PLN` })
@@ -78,7 +81,7 @@ export const listingRouter = createTRPCRouter({
         where: { listingId: input.listingId },
         orderBy: { amount: 'desc' },
         take: 20,
-        select: { id: true, amount: true, createdAt: true, isWinning: true, bidder: { select: { name: true } } },
+        select: { id: true, bidderId: true, amount: true, createdAt: true, isWinning: true, bidder: { select: { name: true } } },
       })
       return bids.map((b) => ({ ...b, amount: Number(b.amount), createdAt: b.createdAt.toISOString() }))
     }),

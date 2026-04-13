@@ -13,6 +13,7 @@ out
 # Generated
 .prisma
 prisma/generated
+packages/db/generated
 
 # Environment
 .env

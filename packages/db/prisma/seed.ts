@@ -13,7 +13,7 @@
 import { config } from 'dotenv'
 import { join } from 'path'
 import { fileURLToPath } from 'url'
-import { PrismaClient, VerificationStatus } from '@prisma/client'
+import { PrismaClient, VerificationStatus } from '../generated/client'
 import { createClient } from '@supabase/supabase-js'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))

@@ -1,11 +1,7 @@
 import Image from 'next/image'
 import { Link } from '@/src/i18n/navigation'
 import { getAllArtworks } from '@/src/lib/data'
-
-function priceFromId(id: string): number {
-  const hash = id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
-  return (8 + (hash % 117)) * 100
-}
+import { HeartIcon } from '@/components/heart-icon'
 
 export async function ArtworkGrid() {
   const artworks = await getAllArtworks()
@@ -18,7 +14,6 @@ export async function ArtworkGrid() {
         const photoUrl = photo
           ? `${supabaseUrl}/storage/v1/object/public/artworks/${photo.storagePath}`
           : null
-        const price = priceFromId(artwork.id)
 
         return (
           <Link
@@ -37,8 +32,15 @@ export async function ArtworkGrid() {
             )}
             <div className="p-3">
               <p className="truncate text-sm font-medium">{artwork.title}</p>
-              <p className="text-xs text-muted-foreground">{artwork.artist.user.name}</p>
-              <p className="mt-1 text-sm font-semibold">{price.toLocaleString('pl-PL')} PLN</p>
+              <div className="mt-0.5 flex items-center justify-between gap-2">
+                <p className="truncate text-xs text-muted-foreground">{artwork.artist.user.name}</p>
+                {artwork._count.interests > 0 && (
+                  <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
+                    <HeartIcon />
+                    {artwork._count.interests}
+                  </span>
+                )}
+              </div>
             </div>
           </Link>
         )

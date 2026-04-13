@@ -12,9 +12,11 @@ import { trpc } from '@/src/lib/trpc/client'
 import { createClient } from '@/src/lib/supabase/client'
 import { useTranslations } from 'next-intl'
 import { Countdown } from './countdown'
+import { CardSetupForm } from '@/components/card-setup-form'
 
 type Bid = {
   id: string
+  bidderId: string
   amount: number
   createdAt: string
   isWinning: boolean
@@ -53,6 +55,12 @@ export function BidPanel({
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<{ amount: string }>({
     defaultValues: { amount: String(minimumBid) },
   })
+
+  const { data: paymentData, refetch: refetchPayment } = trpc.billing.hasPaymentMethod.useQuery(
+    undefined,
+    { enabled: !!userId },
+  )
+  const hasCard = paymentData?.has ?? false
 
   const { refetch } = trpc.listing.getBids.useQuery(
     { listingId: listing.id },
@@ -101,7 +109,7 @@ export function BidPanel({
   }
 
   const isOwner = userId === listing.artwork.artist.userId
-  const canBid = userId && !isOwner
+  const isTopBidder = !!userId && !!highestBid && highestBid.bidderId === userId
 
   return (
     <div className="rounded-lg border p-6 space-y-6">
@@ -132,6 +140,13 @@ export function BidPanel({
           </Button>
         ) : isOwner ? (
           <p className="text-sm text-muted-foreground">{t('ownArtwork')}</p>
+        ) : !hasCard ? (
+          <CardSetupForm onSuccess={() => refetchPayment()} />
+        ) : isTopBidder ? (
+          <div className="space-y-3">
+            <Button className="w-full" disabled>{t('submit')}</Button>
+            <p className="text-center text-sm text-muted-foreground">{t('youAreTopBidder')}</p>
+          </div>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
             <div>
