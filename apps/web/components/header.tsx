@@ -40,6 +40,9 @@ export async function Header({ locale }: { locale: string }) {
             <Button variant="ghost" size="sm" asChild>
               <Link href="/artworks/new">{t('sell')}</Link>
             </Button>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/account/orders">{t('orders')}</Link>
+            </Button>
             <FeedbackModal trigger={<Button variant="ghost" size="sm">{tFeedback('trigger')}</Button>} />
             <form action={signOutAction}>
               <Button variant="ghost" size="sm" type="submit">

@@ -1,0 +1,26 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
+import { useRouter } from '@/src/i18n/navigation'
+import { Button } from '@/components/ui/button'
+import { trpc } from '@/src/lib/trpc/client'
+
+export function OpenDisputeButton({ escrowPaymentId }: { escrowPaymentId: string }) {
+  const t = useTranslations('orders')
+  const router = useRouter()
+
+  const open = trpc.dispute.open.useMutation({
+    onSuccess: () => router.refresh(),
+  })
+
+  return (
+    <Button
+      variant="destructive"
+      size="sm"
+      disabled={open.isPending}
+      onClick={() => open.mutate({ escrowPaymentId })}
+    >
+      {t('openDispute')}
+    </Button>
+  )
+}

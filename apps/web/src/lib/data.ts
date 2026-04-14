@@ -150,6 +150,46 @@ export const getArtistById = cache(async (id: string) => {
   })
 })
 
+const orderSelect = {
+  id: true,
+  closedAt: true,
+  artwork: {
+    select: {
+      title: true,
+      photos: { where: { isPrimary: true }, take: 1, select: { storagePath: true } },
+    },
+  },
+  winningBid: {
+    select: {
+      amount: true,
+      bidder: { select: { name: true } },
+    },
+  },
+  escrowPayment: {
+    select: {
+      id: true,
+      status: true,
+      dispute: { select: { id: true } },
+    },
+  },
+} as const
+
+export const getPurchases = cache(async (userId: string) => {
+  return db.auctionListing.findMany({
+    where: { status: 'ENDED', winningBid: { bidderId: userId } },
+    orderBy: { closedAt: 'desc' },
+    select: orderSelect,
+  })
+})
+
+export const getSales = cache(async (userId: string) => {
+  return db.auctionListing.findMany({
+    where: { status: 'ENDED', artwork: { artist: { userId } } },
+    orderBy: { closedAt: 'desc' },
+    select: orderSelect,
+  })
+})
+
 export const getArtistWithArtworks = cache(async (userId: string) => {
   return db.artist.findUnique({
     where: { userId },

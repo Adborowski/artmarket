@@ -27,6 +27,7 @@
     "myBids": "Moje licytacje",
     "profile": "Profil",
     "myArtworks": "Moje prace",
+    "orders": "Zamówienia",
     "signIn": "Zaloguj się",
     "signOut": "Wyloguj się"
   },
@@ -100,6 +101,34 @@
       "contactArtist": "Napisz do artysty",
       "contactSubject": "Zapytanie o pracę: {title}"
     }
+  },
+  "dispute": {
+    "title": "Spór",
+    "statusOpen": "Otwarty",
+    "statusResolved": "Rozwiązany",
+    "regarding": "Dotyczy",
+    "between": "Między",
+    "you": "ty",
+    "messagePlaceholder": "Napisz wiadomość...",
+    "send": "Wyślij",
+    "sending": "Wysyłanie...",
+    "realtimeNote": "Włącz Realtime dla tabeli DisputeMessage w Supabase, aby otrzymywać wiadomości na żywo.",
+    "notFound": "Nie znaleziono sporu."
+  },
+  "orders": {
+    "title": "Zamówienia",
+    "purchases": "Zakupy",
+    "sales": "Sprzedaż",
+    "empty": "Brak zamówień.",
+    "statusUnsold": "Niesprzedane",
+    "statusPaymentPending": "Oczekiwanie na płatność",
+    "statusAwaitingDelivery": "Oczekiwanie na dostawę",
+    "statusInDispute": "W sporze",
+    "statusComplete": "Zakończone",
+    "openDispute": "Otwórz spór",
+    "viewDispute": "Zobacz spór",
+    "soldTo": "Sprzedano do",
+    "noBids": "Brak ofert"
   },
   "billing": {
     "cardPrompt": "Dodaj kartę, aby licytować. Płatność zostanie pobrana tylko jeśli wygrasz.",

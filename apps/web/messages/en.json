@@ -27,6 +27,7 @@
     "myBids": "My bids",
     "profile": "Profile",
     "myArtworks": "My artworks",
+    "orders": "Orders",
     "signIn": "Sign in",
     "signOut": "Sign out"
   },
@@ -100,6 +101,34 @@
       "contactArtist": "Contact artist",
       "contactSubject": "Enquiry about: {title}"
     }
+  },
+  "dispute": {
+    "title": "Dispute",
+    "statusOpen": "Open",
+    "statusResolved": "Resolved",
+    "regarding": "Regarding",
+    "between": "Between",
+    "you": "you",
+    "messagePlaceholder": "Write a message...",
+    "send": "Send",
+    "sending": "Sending...",
+    "realtimeNote": "Enable Realtime on the DisputeMessage table in Supabase for live updates.",
+    "notFound": "Dispute not found."
+  },
+  "orders": {
+    "title": "Orders",
+    "purchases": "Purchases",
+    "sales": "Sales",
+    "empty": "Nothing here yet.",
+    "statusUnsold": "Unsold",
+    "statusPaymentPending": "Payment pending",
+    "statusAwaitingDelivery": "Awaiting delivery",
+    "statusInDispute": "In dispute",
+    "statusComplete": "Complete",
+    "openDispute": "Open dispute",
+    "viewDispute": "View dispute",
+    "soldTo": "Sold to",
+    "noBids": "No bids"
   },
   "billing": {
     "cardPrompt": "Add a card to place bids. You'll only be charged if you win.",
