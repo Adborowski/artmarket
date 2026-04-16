@@ -1,5 +1,6 @@
 import { db } from '@artmarket/db'
 import { getStripe } from './stripe'
+import { notify } from './notify'
 
 const PLATFORM_COMMISSION_RATE = 0.10 // 10%
 
@@ -15,6 +16,7 @@ export async function closeListing(listingId: string): Promise<void> {
     include: {
       bids: { orderBy: { amount: 'desc' }, take: 1 },
       escrowPayment: { select: { id: true } },
+      artwork: { select: { title: true, artist: { select: { userId: true } } } },
     },
   })
 
@@ -39,6 +41,29 @@ export async function closeListing(listingId: string): Promise<void> {
       await tx.bid.update({ where: { id: winningBid.id }, data: { isWinning: true } })
     }
   })
+
+  const artworkTitle = listing.artwork.title
+  const artistUserId = listing.artwork.artist.userId
+
+  if (winningBid) {
+    // Notify buyer they won
+    notify({
+      userId: winningBid.bidderId,
+      type: 'AUCTION_WON',
+      title: 'Wygrałeś aukcję!',
+      body: `Twoja oferta ${Number(winningBid.amount).toLocaleString('pl-PL')} PLN na „${artworkTitle}" wygrała. Oczekuj na kontakt od artysty.`,
+      link: `/listings/${listingId}`,
+    }).catch(() => {})
+  } else {
+    // Notify artist their auction ended without a sale
+    notify({
+      userId: artistUserId,
+      type: 'AUCTION_ENDED_NO_SALE',
+      title: 'Aukcja zakończona bez sprzedaży',
+      body: `Aukcja „${artworkTitle}" zakończyła się bez ofert spełniających wymagania. Możesz wystawić pracę ponownie.`,
+      link: `/artworks`,
+    }).catch(() => {})
+  }
 
   // Charge the winner outside the DB transaction (Stripe call can't be rolled back)
   if (winningBid) {

@@ -17,7 +17,7 @@ export function DeleteArtworkButton({ action, label }: Props) {
   }
 
   return (
-    <Button variant="destructive" size="lg" className="w-full" disabled={isPending} onClick={handleClick}>
+    <Button variant="outline" size="lg" className="w-full border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700" disabled={isPending} onClick={handleClick}>
       {label}
     </Button>
   )

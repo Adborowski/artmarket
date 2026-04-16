@@ -2,6 +2,7 @@ import { db } from '@artmarket/db'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { createTRPCRouter, artistProcedure, protectedProcedure, publicProcedure } from '../trpc'
+import { notify } from '../lib/notify'
 
 const MIN_INCREMENT = 50
 
@@ -22,6 +23,16 @@ export const listingRouter = createTRPCRouter({
         select: { id: true },
       })
       if (existing) throw new TRPCError({ code: 'CONFLICT', message: 'An active listing already exists for this artwork' })
+
+      const escrowBlock = await db.auctionListing.findFirst({
+        where: {
+          artworkId: input.artworkId,
+          status: 'ENDED',
+          escrowPayment: { status: { in: ['HELD', 'DISPUTED'] } },
+        },
+        select: { id: true },
+      })
+      if (escrowBlock) throw new TRPCError({ code: 'CONFLICT', message: 'Cannot relist while payment is in escrow' })
 
       const now = new Date()
       const endsAt = new Date(now)
@@ -49,8 +60,8 @@ export const listingRouter = createTRPCRouter({
           status: true,
           endsAt: true,
           startPrice: true,
-          artwork: { select: { artist: { select: { userId: true } } } },
-          bids: { orderBy: { amount: 'desc' }, take: 1, select: { id: true, amount: true } },
+          artwork: { select: { title: true, artist: { select: { userId: true } } } },
+          bids: { orderBy: { amount: 'desc' }, take: 1, select: { id: true, amount: true, bidderId: true } },
         },
       })
 
@@ -72,6 +83,30 @@ export const listingRouter = createTRPCRouter({
           data: { listingId: input.listingId, bidderId: ctx.userId, amount: input.amount, isWinning: true },
         })
       })
+
+      const artworkTitle = listing.artwork.title
+      const artistUserId = listing.artwork.artist.userId
+      const amountFormatted = input.amount.toLocaleString('pl-PL')
+
+      // Notify artist: new bid on their listing
+      notify({
+        userId: artistUserId,
+        type: 'NEW_BID',
+        title: 'Nowa oferta',
+        body: `Nowa oferta ${amountFormatted} PLN na „${artworkTitle}".`,
+        link: `/listings/${input.listingId}`,
+      }).catch(() => {})
+
+      // Notify previous top bidder: they were outbid
+      if (highest && highest.bidderId !== ctx.userId) {
+        notify({
+          userId: highest.bidderId,
+          type: 'OUTBID',
+          title: 'Przebita oferta',
+          body: `Twoja oferta na „${artworkTitle}" została przebita. Złóż nową, aby wygrać.`,
+          link: `/listings/${input.listingId}`,
+        }).catch(() => {})
+      }
     }),
 
   getBids: publicProcedure

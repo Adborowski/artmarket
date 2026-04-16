@@ -155,6 +155,8 @@ export async function ListingDetail({ id }: { id: string }) {
                 <p className="text-xl font-bold">{winningBid.bidder.name}</p>
                 <p className="text-2xl font-bold mt-1">{Number(winningBid.amount).toLocaleString('pl-PL')} PLN</p>
               </div>
+            ) : listing.bids.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t('noBids')}</p>
             ) : (
               <p className="text-sm text-muted-foreground">{t('reserveNotMet')}</p>
             )}

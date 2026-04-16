@@ -6,6 +6,7 @@ import { listingRouter } from './routers/listing'
 import { feedbackRouter } from './routers/feedback'
 import { billingRouter } from './routers/billing'
 import { disputeRouter } from './routers/dispute'
+import { notificationRouter } from './routers/notification'
 
 export const appRouter = createTRPCRouter({
   user: userRouter,
@@ -15,6 +16,7 @@ export const appRouter = createTRPCRouter({
   feedback: feedbackRouter,
   billing: billingRouter,
   dispute: disputeRouter,
+  notification: notificationRouter,
 })
 
 export type AppRouter = typeof appRouter

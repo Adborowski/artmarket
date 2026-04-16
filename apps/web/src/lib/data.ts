@@ -190,6 +190,21 @@ export const getSales = cache(async (userId: string) => {
   })
 })
 
+export const getUnreadNotificationCount = cache(async (userId: string) => {
+  return db.notification.count({ where: { userId, read: false } })
+})
+
+export const getArtworkEscrowBlock = cache(async (artworkId: string) => {
+  return db.auctionListing.findFirst({
+    where: {
+      artworkId,
+      status: 'ENDED',
+      escrowPayment: { status: { in: ['HELD', 'DISPUTED'] } },
+    },
+    select: { id: true },
+  })
+})
+
 export const getArtistWithArtworks = cache(async (userId: string) => {
   return db.artist.findUnique({
     where: { userId },

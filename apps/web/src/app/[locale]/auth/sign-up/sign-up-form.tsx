@@ -13,6 +13,7 @@ import { Link } from '@/src/i18n/navigation'
 import { signUp } from '@/src/lib/auth/actions'
 
 const schema = z.object({
+  name: z.string().min(1),
   email: z.string().email(),
   password: z.string().min(8),
 })
@@ -26,13 +27,13 @@ export function SignUpForm({ locale }: { locale: string }) {
 
   const form = useForm<Values>({
     resolver: standardSchemaResolver(schema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { name: '', email: '', password: '' },
   })
 
   function onSubmit(values: Values) {
     setServerError(null)
     startTransition(async () => {
-      const result = await signUp(locale, values.email, values.password)
+      const result = await signUp(locale, values.email, values.password, values.name)
       if (result?.error) setServerError(t('signUp.error'))
     })
   }
@@ -45,6 +46,19 @@ export function SignUpForm({ locale }: { locale: string }) {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('name')}</FormLabel>
+                  <FormControl>
+                    <Input placeholder={t('namePlaceholder')} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="email"

@@ -32,6 +32,8 @@
     "signOut": "Sign out"
   },
   "auth": {
+    "name": "Full name",
+    "namePlaceholder": "Anna Kowalska",
     "email": "Email",
     "emailPlaceholder": "you@example.com",
     "password": "Password",
@@ -97,9 +99,24 @@
       "startAuction": "Start auction",
       "auctionInProgress": "Auction in progress",
       "viewAuction": "View auction",
+      "escrowPending": "Unavailable — awaiting payment settlement",
       "interested": "I'm interested",
       "contactArtist": "Contact artist",
       "contactSubject": "Enquiry about: {title}"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet."
+  },
+  "account": {
+    "profile": {
+      "title": "Profile",
+      "nameLabel": "Full name",
+      "save": "Save",
+      "saving": "Saving...",
+      "saved": "Saved",
+      "error": "Failed to save. Please try again."
     }
   },
   "dispute": {
@@ -189,6 +206,7 @@
       "signInToBid": "Sign in to bid",
       "youAreTopBidder": "Your offer is the highest",
       "bids": "Bids",
+      "bidIncrement": "steps of 50 PLN",
       "realtimeNote": "Enable Realtime on the Bid table in Supabase dashboard for live updates."
     }
   }

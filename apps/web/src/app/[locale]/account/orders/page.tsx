@@ -85,7 +85,7 @@ export default async function OrdersPage({
           {orders.map((order) => {
             const photo = order.artwork.photos[0]
             const imgSrc = photo
-              ? `${supabaseUrl}/storage/v1/object/public/${photo.storagePath}`
+              ? `${supabaseUrl}/storage/v1/object/public/artworks/${photo.storagePath}`
               : null
             const sk = statusKey(order)
             const amount = order.winningBid ? Number(order.winningBid.amount) : null

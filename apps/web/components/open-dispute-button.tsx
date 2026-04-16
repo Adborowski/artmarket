@@ -15,8 +15,9 @@ export function OpenDisputeButton({ escrowPaymentId }: { escrowPaymentId: string
 
   return (
     <Button
-      variant="destructive"
+      variant="outline"
       size="sm"
+      className="border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700"
       disabled={open.isPending}
       onClick={() => open.mutate({ escrowPaymentId })}
     >

@@ -43,6 +43,16 @@ enum DisputeStatus {
   RESOLVED
 }
 
+enum NotificationType {
+  NEW_BID
+  OUTBID
+  AUCTION_WON
+  AUCTION_ENDED_NO_SALE
+  PAYMENT_CAPTURED
+  DISPUTE_OPENED
+  DISPUTE_MESSAGE
+}
+
 // ---------------------------------------------------------------------------
 // User & Artist
 // ---------------------------------------------------------------------------
@@ -64,6 +74,7 @@ model User {
   openedDisputes   Dispute[]
   disputeMessages  DisputeMessage[]
   artworkInterests ArtworkInterest[]
+  notifications    Notification[]
 }
 
 // Only exists when a user has registered as an artist.
@@ -237,4 +248,23 @@ model DisputeMessage {
   sender    User     @relation(fields: [senderId], references: [id])
   body      String
   createdAt DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Notifications
+// ---------------------------------------------------------------------------
+
+// Subscribable via Supabase Realtime to drive the live bell counter.
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  body      String
+  link      String?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId, createdAt(sort: Desc)])
 }

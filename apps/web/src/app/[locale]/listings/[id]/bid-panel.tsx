@@ -153,7 +153,7 @@ export function BidPanel({
               <label className="text-sm font-medium">
                 {t('yourBid')}
                 <span className="ml-2 text-xs text-muted-foreground">
-                  ({t('minimumBid')}: {minimumBid.toLocaleString('pl-PL')} PLN)
+                  ({t('minimumBid')}: {minimumBid.toLocaleString('pl-PL')} PLN · {t('bidIncrement')})
                 </span>
               </label>
               <Input

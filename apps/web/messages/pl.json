@@ -32,6 +32,8 @@
     "signOut": "Wyloguj się"
   },
   "auth": {
+    "name": "Imię i nazwisko",
+    "namePlaceholder": "Anna Kowalska",
     "email": "Email",
     "emailPlaceholder": "ty@example.com",
     "password": "Hasło",
@@ -97,9 +99,24 @@
       "startAuction": "Wystaw na aukcję",
       "auctionInProgress": "Aukcja w toku",
       "viewAuction": "Zobacz aukcję",
+      "escrowPending": "Niedostępne — oczekiwanie na rozliczenie płatności",
       "interested": "Jestem zainteresowany/a",
       "contactArtist": "Napisz do artysty",
       "contactSubject": "Zapytanie o pracę: {title}"
+    }
+  },
+  "notifications": {
+    "title": "Powiadomienia",
+    "empty": "Brak powiadomień."
+  },
+  "account": {
+    "profile": {
+      "title": "Profil",
+      "nameLabel": "Imię i nazwisko",
+      "save": "Zapisz",
+      "saving": "Zapisywanie...",
+      "saved": "Zapisano",
+      "error": "Nie udało się zapisać. Spróbuj ponownie."
     }
   },
   "dispute": {
@@ -189,6 +206,7 @@
       "signInToBid": "Zaloguj się, aby licytować",
       "youAreTopBidder": "Twoja oferta jest najwyższa",
       "bids": "Oferty",
+      "bidIncrement": "kroki po 50 PLN",
       "realtimeNote": "Włącz Realtime dla tabeli Bid w panelu Supabase, aby otrzymywać aktualizacje na żywo."
     }
   }

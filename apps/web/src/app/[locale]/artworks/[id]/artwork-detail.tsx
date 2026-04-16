@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/src/i18n/navigation'
 import { Button } from '@/components/ui/button'
-import { getArtworkById, getSessionUser, getArtworkInterestForUser } from '@/src/lib/data'
+import { getArtworkById, getSessionUser, getArtworkInterestForUser, getArtworkEscrowBlock } from '@/src/lib/data'
 import { deleteArtwork } from '@/src/lib/artwork/actions'
 import { DeleteArtworkButton } from '@/components/delete-artwork-button'
 import { ArtistBanner } from '@/components/artist-banner'
@@ -24,7 +24,10 @@ export async function ArtworkDetail({ id, locale }: { id: string; locale: string
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const primaryPhoto = artwork.photos.find((p) => p.isPrimary) ?? artwork.photos[0]
   const activeListing = artwork.listings?.[0] ?? null
-  const userInterested = user && !isOwner ? await getArtworkInterestForUser(artwork.id, user.id) : false
+  const [userInterested, escrowBlock] = await Promise.all([
+    user && !isOwner ? getArtworkInterestForUser(artwork.id, user.id) : Promise.resolve(false),
+    isOwner && !activeListing ? getArtworkEscrowBlock(artwork.id) : Promise.resolve(null),
+  ])
 
   return (
     <div className="grid gap-10 md:grid-cols-2">
@@ -112,6 +115,8 @@ export async function ArtworkDetail({ id, locale }: { id: string; locale: string
                     <Link href={`/listings/${activeListing.id}`}>{t('viewAuction')}</Link>
                   </Button>
                 </div>
+              ) : escrowBlock ? (
+                <p className="text-sm text-muted-foreground">{t('escrowPending')}</p>
               ) : (
                 <div className="space-y-3">
                   <DeleteArtworkButton

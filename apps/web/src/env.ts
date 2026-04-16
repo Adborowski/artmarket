@@ -12,6 +12,7 @@ export const env = createEnv({
     STRIPE_WEBHOOK_SECRET: z.string().startsWith('whsec_').optional(),
     RESEND_API_KEY: z.string().startsWith('re_').optional(),
     SUPPORT_EMAIL: z.string().email().optional(),
+    APP_URL: z.string().url().optional(),
     CRON_SECRET: z.string().min(1).optional(),
   },
   client: {
@@ -29,6 +30,7 @@ export const env = createEnv({
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     SUPPORT_EMAIL: process.env.SUPPORT_EMAIL,
+    APP_URL: process.env.APP_URL,
     CRON_SECRET: process.env.CRON_SECRET,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,

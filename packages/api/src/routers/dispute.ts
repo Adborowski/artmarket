@@ -2,6 +2,7 @@ import { db } from '@artmarket/db'
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
+import { notify } from '../lib/notify'
 
 export type DisputeMessage = {
   id: string
@@ -94,7 +95,7 @@ export const disputeRouter = createTRPCRouter({
             include: {
               listing: {
                 include: {
-                  artwork: { select: { artist: { select: { userId: true } } } },
+                  artwork: { select: { title: true, artist: { select: { userId: true } } } },
                   winningBid: { select: { bidderId: true } },
                 },
               },
@@ -116,6 +117,18 @@ export const disputeRouter = createTRPCRouter({
         data: { disputeId: input.disputeId, senderId: ctx.userId, body: input.body },
       })
 
+      // Notify the other party about the new message
+      const recipientId = ctx.userId === buyerId ? artistUserId : buyerId
+      if (recipientId) {
+        notify({
+          userId: recipientId,
+          type: 'DISPUTE_MESSAGE',
+          title: 'Nowa wiadomość w sporze',
+          body: `Masz nową wiadomość dotyczącą „${dispute.escrowPayment.listing.artwork.title}".`,
+          link: `/account/disputes/${input.disputeId}`,
+        }).catch(() => {})
+      }
+
       return { ok: true }
     }),
 
@@ -131,7 +144,7 @@ export const disputeRouter = createTRPCRouter({
           listing: {
             include: {
               winningBid: { select: { bidderId: true } },
-              artwork: { include: { artist: { select: { userId: true } } } },
+              artwork: { select: { title: true, artist: { select: { userId: true } } } },
             },
           },
           dispute: { select: { id: true } },
@@ -150,7 +163,7 @@ export const disputeRouter = createTRPCRouter({
       const artistUserId = escrow.listing.artwork.artist.userId
       assertParticipant(ctx.userId, buyerId, artistUserId)
 
-      await db.$transaction([
+      const [dispute] = await db.$transaction([
         db.dispute.create({
           data: { escrowPaymentId: input.escrowPaymentId, openedById: ctx.userId },
         }),
@@ -159,6 +172,19 @@ export const disputeRouter = createTRPCRouter({
           data: { releaseScheduledAt: null, status: 'DISPUTED' },
         }),
       ])
+
+      // Notify the other party that a dispute was opened
+      const recipientId = ctx.userId === buyerId ? artistUserId : buyerId
+      const artworkTitle = escrow.listing.artwork.title
+      if (recipientId) {
+        notify({
+          userId: recipientId,
+          type: 'DISPUTE_OPENED',
+          title: 'Otwarto spór',
+          body: `Zgłoszono spór dotyczący „${artworkTitle}". Przejdź do panelu sporów, aby odpowiedzieć.`,
+          link: `/account/disputes/${dispute.id}`,
+        }).catch(() => {})
+      }
 
       return { ok: true }
     }),
