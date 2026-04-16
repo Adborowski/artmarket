@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 import { notify } from '../lib/notify'
+import { settleDispute } from '../lib/settle-dispute'
 
 export type DisputeMessage = {
   id: string
@@ -14,6 +15,7 @@ export type DisputeMessage = {
 export type DisputeDetail = {
   id: string
   status: string
+  resolvedOutcome: string | null
   createdAt: string
   artworkTitle: string
   buyerId: string
@@ -23,14 +25,31 @@ export type DisputeDetail = {
   messages: DisputeMessage[]
 }
 
+export type DisputeSummary = {
+  id: string
+  status: string
+  resolvedOutcome: string | null
+  createdAt: string
+  artworkTitle: string
+  buyerName: string
+  artistName: string
+}
+
 function assertParticipant(userId: string, buyerId: string, artistUserId: string) {
   if (userId !== buyerId && userId !== artistUserId) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 }
 
+function assertAdmin(userId: string) {
+  const adminId = process.env.ADMIN_USER_ID
+  if (!adminId || userId !== adminId) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+}
+
 export const disputeRouter = createTRPCRouter({
-  // Fetches a dispute by ID. Only accessible to the buyer and artist involved.
+  // Fetches a dispute by ID. Accessible to the buyer, artist, and admin.
   getById: protectedProcedure
     .input(z.object({ disputeId: z.string() }))
     .query(async ({ ctx, input }): Promise<DisputeDetail> => {
@@ -63,11 +82,13 @@ export const disputeRouter = createTRPCRouter({
 
       const buyerId = dispute.escrowPayment.listing.winningBid?.bidderId ?? ''
       const artistUserId = dispute.escrowPayment.listing.artwork.artist.userId
-      assertParticipant(ctx.userId, buyerId, artistUserId)
+      const isAdmin = process.env.ADMIN_USER_ID && ctx.userId === process.env.ADMIN_USER_ID
+      if (!isAdmin) assertParticipant(ctx.userId, buyerId, artistUserId)
 
       return {
         id: dispute.id,
         status: dispute.status,
+        resolvedOutcome: dispute.resolvedOutcome,
         createdAt: dispute.createdAt.toISOString(),
         artworkTitle: dispute.escrowPayment.listing.artwork.title,
         buyerId,
@@ -84,7 +105,6 @@ export const disputeRouter = createTRPCRouter({
     }),
 
   // Sends a message in a dispute. Only the buyer and artist can send.
-  // Returns { ok: true } — Supabase Realtime delivers the message to the other party.
   sendMessage: protectedProcedure
     .input(z.object({ disputeId: z.string(), body: z.string().min(1).max(2000) }))
     .mutation(async ({ ctx, input }) => {
@@ -117,7 +137,6 @@ export const disputeRouter = createTRPCRouter({
         data: { disputeId: input.disputeId, senderId: ctx.userId, body: input.body },
       })
 
-      // Notify the other party about the new message
       const recipientId = ctx.userId === buyerId ? artistUserId : buyerId
       if (recipientId) {
         notify({
@@ -133,8 +152,6 @@ export const disputeRouter = createTRPCRouter({
     }),
 
   // Opens a dispute for a given escrow payment.
-  // Available to both the buyer (winning bidder) and the artist.
-  // Freezes the 14-day auto-release by clearing releaseScheduledAt.
   open: protectedProcedure
     .input(z.object({ escrowPaymentId: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -173,7 +190,6 @@ export const disputeRouter = createTRPCRouter({
         }),
       ])
 
-      // Notify the other party that a dispute was opened
       const recipientId = ctx.userId === buyerId ? artistUserId : buyerId
       const artworkTitle = escrow.listing.artwork.title
       if (recipientId) {
@@ -186,6 +202,246 @@ export const disputeRouter = createTRPCRouter({
         }).catch(() => {})
       }
 
+      return { ok: true, disputeId: dispute.id }
+    }),
+
+  // Buyer releases funds to the artist (unilateral — buyer gives up their claim).
+  releaseFunds: protectedProcedure
+    .input(z.object({ disputeId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const dispute = await db.dispute.findUnique({
+        where: { id: input.disputeId },
+        include: {
+          escrowPayment: {
+            include: { listing: { include: { winningBid: { select: { bidderId: true } } } } },
+          },
+        },
+      })
+
+      if (!dispute) throw new TRPCError({ code: 'NOT_FOUND' })
+      if (dispute.status === 'RESOLVED') {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Dispute already resolved' })
+      }
+
+      const buyerId = dispute.escrowPayment.listing.winningBid?.bidderId ?? ''
+      if (ctx.userId !== buyerId) throw new TRPCError({ code: 'FORBIDDEN' })
+
+      await settleDispute(input.disputeId, 'RELEASED')
       return { ok: true }
+    }),
+
+  // Artist offers a refund to the buyer (buyer must confirm).
+  offerRefund: protectedProcedure
+    .input(z.object({ disputeId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const dispute = await db.dispute.findUnique({
+        where: { id: input.disputeId },
+        include: {
+          escrowPayment: {
+            include: {
+              listing: {
+                include: {
+                  artwork: { select: { title: true, artist: { select: { userId: true } } } },
+                  winningBid: { select: { bidderId: true } },
+                },
+              },
+            },
+          },
+        },
+      })
+
+      if (!dispute) throw new TRPCError({ code: 'NOT_FOUND' })
+      if (dispute.status !== 'OPEN') {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Refund offer only allowed when dispute is OPEN' })
+      }
+
+      const artistUserId = dispute.escrowPayment.listing.artwork.artist.userId
+      if (ctx.userId !== artistUserId) throw new TRPCError({ code: 'FORBIDDEN' })
+
+      await db.dispute.update({
+        where: { id: input.disputeId },
+        data: { status: 'PENDING_REFUND_OFFER' },
+      })
+
+      // Notify buyer
+      const buyerId = dispute.escrowPayment.listing.winningBid?.bidderId ?? ''
+      if (buyerId) {
+        notify({
+          userId: buyerId,
+          type: 'DISPUTE_MESSAGE',
+          title: 'Artysta zaproponował zwrot',
+          body: `Artysta zaproponował zwrot środków za „${dispute.escrowPayment.listing.artwork.title}". Potwierdź lub odrzuć propozycję.`,
+          link: `/account/disputes/${input.disputeId}`,
+        }).catch(() => {})
+      }
+
+      return { ok: true }
+    }),
+
+  // Buyer confirms the artist's refund offer → executes refund.
+  confirmRefund: protectedProcedure
+    .input(z.object({ disputeId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const dispute = await db.dispute.findUnique({
+        where: { id: input.disputeId },
+        include: {
+          escrowPayment: {
+            include: { listing: { include: { winningBid: { select: { bidderId: true } } } } },
+          },
+        },
+      })
+
+      if (!dispute) throw new TRPCError({ code: 'NOT_FOUND' })
+      if (dispute.status !== 'PENDING_REFUND_OFFER') {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'No pending refund offer' })
+      }
+
+      const buyerId = dispute.escrowPayment.listing.winningBid?.bidderId ?? ''
+      if (ctx.userId !== buyerId) throw new TRPCError({ code: 'FORBIDDEN' })
+
+      await settleDispute(input.disputeId, 'REFUNDED')
+      return { ok: true }
+    }),
+
+  // Buyer rejects the artist's refund offer → dispute goes back to OPEN.
+  rejectRefund: protectedProcedure
+    .input(z.object({ disputeId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const dispute = await db.dispute.findUnique({
+        where: { id: input.disputeId },
+        include: {
+          escrowPayment: {
+            include: {
+              listing: {
+                include: {
+                  artwork: { select: { title: true, artist: { select: { userId: true } } } },
+                  winningBid: { select: { bidderId: true } },
+                },
+              },
+            },
+          },
+        },
+      })
+
+      if (!dispute) throw new TRPCError({ code: 'NOT_FOUND' })
+      if (dispute.status !== 'PENDING_REFUND_OFFER') {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'No pending refund offer' })
+      }
+
+      const buyerId = dispute.escrowPayment.listing.winningBid?.bidderId ?? ''
+      if (ctx.userId !== buyerId) throw new TRPCError({ code: 'FORBIDDEN' })
+
+      await db.dispute.update({
+        where: { id: input.disputeId },
+        data: { status: 'OPEN' },
+      })
+
+      // Notify artist their offer was rejected
+      const artistUserId = dispute.escrowPayment.listing.artwork.artist.userId
+      notify({
+        userId: artistUserId,
+        type: 'DISPUTE_MESSAGE',
+        title: 'Kupujący odrzucił propozycję zwrotu',
+        body: `Kupujący odrzucił Twoją propozycję zwrotu środków za „${dispute.escrowPayment.listing.artwork.title}".`,
+        link: `/account/disputes/${input.disputeId}`,
+      }).catch(() => {})
+
+      return { ok: true }
+    }),
+
+  // Either party escalates to admin review.
+  escalate: protectedProcedure
+    .input(z.object({ disputeId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const dispute = await db.dispute.findUnique({
+        where: { id: input.disputeId },
+        include: {
+          escrowPayment: {
+            include: {
+              listing: {
+                include: {
+                  artwork: { select: { title: true, artist: { select: { userId: true } } } },
+                  winningBid: { select: { bidderId: true } },
+                },
+              },
+            },
+          },
+        },
+      })
+
+      if (!dispute) throw new TRPCError({ code: 'NOT_FOUND' })
+      if (dispute.status === 'RESOLVED' || dispute.status === 'ESCALATED') {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Cannot escalate in current state' })
+      }
+
+      const buyerId = dispute.escrowPayment.listing.winningBid?.bidderId ?? ''
+      const artistUserId = dispute.escrowPayment.listing.artwork.artist.userId
+      assertParticipant(ctx.userId, buyerId, artistUserId)
+
+      await db.dispute.update({
+        where: { id: input.disputeId },
+        data: { status: 'ESCALATED' },
+      })
+
+      // Notify both parties
+      const artworkTitle = dispute.escrowPayment.listing.artwork.title
+      const otherPartyId = ctx.userId === buyerId ? artistUserId : buyerId
+      if (otherPartyId) {
+        notify({
+          userId: otherPartyId,
+          type: 'DISPUTE_OPENED',
+          title: 'Spór przekazany do admina',
+          body: `Spór dotyczący „${artworkTitle}" został przekazany do weryfikacji przez administratora.`,
+          link: `/account/disputes/${input.disputeId}`,
+        }).catch(() => {})
+      }
+
+      return { ok: true }
+    }),
+
+  // Admin: resolve any dispute with either outcome.
+  adminResolve: protectedProcedure
+    .input(z.object({ disputeId: z.string(), outcome: z.enum(['RELEASED', 'REFUNDED']) }))
+    .mutation(async ({ ctx, input }) => {
+      assertAdmin(ctx.userId)
+      await settleDispute(input.disputeId, input.outcome)
+      return { ok: true }
+    }),
+
+  // Admin: list all disputes across the platform.
+  adminListAll: protectedProcedure
+    .query(async ({ ctx }): Promise<DisputeSummary[]> => {
+      assertAdmin(ctx.userId)
+
+      const disputes = await db.dispute.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+          escrowPayment: {
+            include: {
+              listing: {
+                include: {
+                  artwork: {
+                    select: {
+                      title: true,
+                      artist: { select: { user: { select: { name: true } } } },
+                    },
+                  },
+                  winningBid: { select: { bidder: { select: { name: true } } } },
+                },
+              },
+            },
+          },
+        },
+      })
+
+      return disputes.map((d) => ({
+        id: d.id,
+        status: d.status,
+        resolvedOutcome: d.resolvedOutcome,
+        createdAt: d.createdAt.toISOString(),
+        artworkTitle: d.escrowPayment.listing.artwork.title,
+        buyerName: d.escrowPayment.listing.winningBid?.bidder.name ?? '—',
+        artistName: d.escrowPayment.listing.artwork.artist.user.name,
+      }))
     }),
 })

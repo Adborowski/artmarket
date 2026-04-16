@@ -122,6 +122,8 @@
   "dispute": {
     "title": "Dispute",
     "statusOpen": "Open",
+    "statusPendingRefundOffer": "Pending refund offer",
+    "statusEscalated": "Escalated",
     "statusResolved": "Resolved",
     "regarding": "Regarding",
     "between": "Between",
@@ -130,7 +132,22 @@
     "send": "Send",
     "sending": "Sending...",
     "realtimeNote": "Enable Realtime on the DisputeMessage table in Supabase for live updates.",
-    "notFound": "Dispute not found."
+    "notFound": "Dispute not found.",
+    "actionsTitle": "Available actions",
+    "releaseFunds": "Release funds to artist",
+    "offerRefund": "Offer refund to buyer",
+    "confirmRefund": "Accept refund",
+    "rejectRefund": "Reject",
+    "escalate": "Escalate to admin",
+    "escalated": "Escalated",
+    "pendingRefundOffer": "The artist has offered a refund. Do you want to accept it?",
+    "waitingForBuyer": "Waiting for buyer to confirm the refund offer…",
+    "waitingAdmin": "This dispute has been escalated to the admin for review.",
+    "outcomeReleased": "Resolved: funds released to the artist.",
+    "outcomeRefunded": "Resolved: buyer has been refunded.",
+    "adminResolve": "Admin: resolve this dispute",
+    "adminRelease": "Release to artist",
+    "adminRefund": "Refund buyer"
   },
   "orders": {
     "title": "Orders",

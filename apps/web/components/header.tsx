@@ -17,6 +17,7 @@ export async function Header({ locale }: { locale: string }) {
     user ? getUnreadNotificationCount(user.id) : Promise.resolve(0),
   ])
   const isArtist = !!artist
+  const isAdmin = !!process.env.ADMIN_USER_ID && user?.id === process.env.ADMIN_USER_ID
 
   const signOutAction = signOut.bind(null, locale)
 
@@ -48,6 +49,11 @@ export async function Header({ locale }: { locale: string }) {
             <Button variant="ghost" size="sm" asChild>
               <Link href="/account/profile">{t('profile')}</Link>
             </Button>
+            {isAdmin && (
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/admin/disputes">Disputes</Link>
+              </Button>
+            )}
             <BellButton initialCount={unreadCount} />
             <FeedbackModal trigger={<Button variant="ghost" size="sm">{tFeedback('trigger')}</Button>} />
             <form action={signOutAction}>

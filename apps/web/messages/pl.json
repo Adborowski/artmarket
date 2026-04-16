@@ -122,6 +122,8 @@
   "dispute": {
     "title": "Spór",
     "statusOpen": "Otwarty",
+    "statusPendingRefundOffer": "Oczekiwanie na potwierdzenie zwrotu",
+    "statusEscalated": "Przekazany do admina",
     "statusResolved": "Rozwiązany",
     "regarding": "Dotyczy",
     "between": "Między",
@@ -130,7 +132,22 @@
     "send": "Wyślij",
     "sending": "Wysyłanie...",
     "realtimeNote": "Włącz Realtime dla tabeli DisputeMessage w Supabase, aby otrzymywać wiadomości na żywo.",
-    "notFound": "Nie znaleziono sporu."
+    "notFound": "Nie znaleziono sporu.",
+    "actionsTitle": "Dostępne działania",
+    "releaseFunds": "Przekaż środki artyście",
+    "offerRefund": "Zaproponuj zwrot kupującemu",
+    "confirmRefund": "Zaakceptuj zwrot",
+    "rejectRefund": "Odrzuć",
+    "escalate": "Przekaż do admina",
+    "escalated": "Przekazany do admina",
+    "pendingRefundOffer": "Artysta zaproponował zwrot środków. Czy chcesz go zaakceptować?",
+    "waitingForBuyer": "Oczekiwanie na potwierdzenie zwrotu przez kupującego…",
+    "waitingAdmin": "Ten spór został przekazany do weryfikacji przez administratora.",
+    "outcomeReleased": "Rozwiązano: środki zostały przekazane artyście.",
+    "outcomeRefunded": "Rozwiązano: kupujący otrzymał zwrot środków.",
+    "adminResolve": "Admin: rozwiąż ten spór",
+    "adminRelease": "Przekaż artyście",
+    "adminRefund": "Zwróć kupującemu"
   },
   "orders": {
     "title": "Zamówienia",

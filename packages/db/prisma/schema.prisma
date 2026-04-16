@@ -29,6 +29,7 @@ enum ListingStatus {
 enum EscrowStatus {
   HELD
   RELEASED
+  REFUNDED
   DISPUTED
 }
 
@@ -40,6 +41,8 @@ enum PayoutStatus {
 
 enum DisputeStatus {
   OPEN
+  PENDING_REFUND_OFFER
+  ESCALATED
   RESOLVED
 }
 
@@ -232,6 +235,7 @@ model Dispute {
   openedById      String
   openedBy        User          @relation(fields: [openedById], references: [id])
   status          DisputeStatus @default(OPEN)
+  resolvedOutcome String?       // "RELEASED" or "REFUNDED" — set when status becomes RESOLVED
   resolvedAt      DateTime?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
