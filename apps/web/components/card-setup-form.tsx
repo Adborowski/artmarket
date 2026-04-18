@@ -39,10 +39,8 @@ function CardForm({ onSuccess }: { onSuccess: () => void }) {
         return
       }
 
-      if (setupIntent?.payment_method) {
-        await confirmPaymentMethod.mutateAsync({
-          paymentMethodId: setupIntent.payment_method as string,
-        })
+      if (setupIntent?.id) {
+        await confirmPaymentMethod.mutateAsync({ setupIntentId: setupIntent.id })
         onSuccess()
       }
     } catch {

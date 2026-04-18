@@ -157,6 +157,7 @@ const orderSelect = {
     select: {
       title: true,
       photos: { where: { isPrimary: true }, take: 1, select: { storagePath: true } },
+      artist: { select: { user: { select: { name: true } } } },
     },
   },
   winningBid: {
@@ -169,7 +170,12 @@ const orderSelect = {
     select: {
       id: true,
       status: true,
-      dispute: { select: { id: true } },
+      shippedAt: true,
+      carrier: true,
+      trackingNumber: true,
+      deliveredAt: true,
+      dispute: { select: { id: true, status: true } },
+      shippingPhotos: { select: { storagePath: true, order: true }, orderBy: { order: 'asc' } },
     },
   },
 } as const

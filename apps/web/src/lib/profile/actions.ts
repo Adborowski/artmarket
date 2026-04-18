@@ -12,5 +12,9 @@ export async function updateAvatarUrl(avatarUrl: string) {
 export async function updateCoverUrl(coverUrl: string) {
   const user = await getSessionUser()
   if (!user) throw new Error('Unauthorized')
-  await db.artist.update({ where: { userId: user.id }, data: { coverUrl } })
+  await db.artist.upsert({
+    where: { userId: user.id },
+    create: { userId: user.id, coverUrl },
+    update: { coverUrl },
+  })
 }

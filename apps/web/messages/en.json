@@ -18,9 +18,17 @@
     "changeCover": "Change cover",
     "uploadError": "Upload failed. Please try again.",
     "contactArtist": "Contact artist",
-    "contactSubject": "Enquiry — Artmarket"
+    "contactSubject": "Enquiry — Artmarket",
+    "bioEmpty": "No bio yet.",
+    "editBio": "Edit bio",
+    "bioSaved": "Saved",
+    "bioSaving": "Saving…",
+    "bioPlaceholder": "Tell buyers about yourself and your practice…",
+    "save": "Save",
+    "cancel": "Cancel"
   },
   "nav": {
+    "hello": "hello, {name}",
     "explore": "Explore",
     "artists": "Artists",
     "sell": "Sell",
@@ -89,7 +97,9 @@
       "title": "My artworks",
       "empty": "You haven't added any artworks yet.",
       "addNew": "Add artwork",
-      "primaryPhoto": "Primary photo"
+      "primaryPhoto": "Primary photo",
+      "completeProfile": "Complete your seller profile before uploading artwork.",
+      "completeProfileLink": "Go to profile →"
     },
     "detail": {
       "placeBid": "Place bid",
@@ -116,7 +126,19 @@
       "save": "Save",
       "saving": "Saving...",
       "saved": "Saved",
-      "error": "Failed to save. Please try again."
+      "error": "Failed to save. Please try again.",
+      "previewProfile": "Preview profile",
+      "sellerProfileTitle": "Seller profile",
+      "sellerProfileDesc": "Your bio and cover photo appear on your public artist page, visible to buyers. Your IBAN is used for payouts when your artwork sells.",
+      "sellerProfileComplete": "{percent}% complete",
+      "bioLabel": "Bio",
+      "bioPlaceholder": "Tell buyers about yourself and your practice…",
+      "ibanLabel": "IBAN (for payouts)",
+      "ibanPlaceholder": "PL61 1090 1014 0000 0712 1981 2874",
+      "ibanHint": "Required to receive sale proceeds. Never shown publicly.",
+      "ibanInvalid": "Invalid IBAN format.",
+      "paymentTitle": "Payment",
+      "paymentDesc": "Your card is charged only if you win an auction."
     }
   },
   "dispute": {
@@ -162,7 +184,26 @@
     "openDispute": "Open dispute",
     "viewDispute": "View dispute",
     "soldTo": "Sold to",
-    "noBids": "No bids"
+    "noBids": "No bids",
+    "statusAwaitingShipment": "Awaiting shipment",
+    "markShippedPrompt": "Mark this order as shipped once you've sent the artwork.",
+    "carrierPlaceholder": "Carrier — e.g. DHL, InPost",
+    "trackingNumberPlaceholder": "Tracking number",
+    "guideReminder": "Before shipping, make sure you've read our",
+    "guideReminderLink": "Safe Shopping Guide →",
+    "shippingPhotos": "Packaging photos",
+    "shippingPhotosHint": "Upload photos of the artwork and packaging before sending. These serve as evidence if a dispute arises.",
+    "shippingPhotosAdd": "Add photos",
+    "shippingPhotosRemove": "Remove",
+    "shippingPhotosUploadError": "Photo upload failed. Please try again.",
+    "shippingSubmit": "Mark as shipped",
+    "shippingSubmitting": "Saving…",
+    "trackingInfo": "{carrier} — {number}",
+    "awaitingDeliveryConfirmation": "Awaiting buyer confirmation",
+    "confirmDelivery": "Confirm delivery",
+    "confirmDeliveryWarning": "Confirming delivery releases payment to the artist and closes the transaction. Only confirm once you have inspected the artwork and are fully satisfied.",
+    "confirmDeliveryConfirm": "Yes, confirm delivery",
+    "confirmDeliveryCancel": "Cancel"
   },
   "billing": {
     "cardPrompt": "Add a card to place bids. You'll only be charged if you win.",
@@ -222,6 +263,8 @@
       "ownArtwork": "You cannot bid on your own artwork",
       "signInToBid": "Sign in to bid",
       "youAreTopBidder": "Your offer is the highest",
+      "noCard": "To place bids, add a card in your",
+      "noCardLink": "profile →",
       "bids": "Bids",
       "bidIncrement": "steps of 50 PLN",
       "realtimeNote": "Enable Realtime on the Bid table in Supabase dashboard for live updates."

@@ -65,7 +65,7 @@ export default async function DisputePage({
   const buyerName = dispute.escrowPayment.listing.winningBid?.bidder.name ?? ''
   const artistName = dispute.escrowPayment.listing.artwork.artist.user.name
 
-  const badge = STATUS_BADGE[dispute.status] ?? STATUS_BADGE.OPEN
+  const badge = STATUS_BADGE[dispute.status] ?? { label: 'statusOpen' as const, className: '' }
 
   const initialMessages = dispute.messages.map((m) => ({
     id: m.id,

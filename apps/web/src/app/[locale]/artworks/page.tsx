@@ -19,7 +19,7 @@ export default async function ArtworksPage({
   return (
     <main className="mx-auto max-w-5xl px-4 py-10">
       <Suspense fallback={<ArtworkListSkeleton />}>
-        <ArtworkList userId={user.id} locale={locale} />
+        <ArtworkList userId={user.id} />
       </Suspense>
     </main>
   )

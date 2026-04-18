@@ -4,15 +4,17 @@ import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { createClient } from '@/src/lib/supabase/client'
 import { updateCoverUrl } from '@/src/lib/profile/actions'
+import { Button } from '@/components/ui/button'
 
 type Props = {
   userId: string
   currentCoverUrl: string | null
   changeCoverLabel: string
   uploadErrorLabel: string
+  variant?: 'overlay' | 'settings'
 }
 
-export function CoverUpload({ userId, currentCoverUrl, changeCoverLabel, uploadErrorLabel }: Props) {
+export function CoverUpload({ userId, currentCoverUrl, changeCoverLabel, uploadErrorLabel, variant = 'overlay' }: Props) {
   const [coverUrl, setCoverUrl] = useState(currentCoverUrl)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -46,6 +48,41 @@ export function CoverUpload({ userId, currentCoverUrl, changeCoverLabel, uploadE
     setUploading(false)
   }
 
+  const input = (
+    <input
+      ref={inputRef}
+      type="file"
+      accept="image/*"
+      className="hidden"
+      onChange={handleFileChange}
+    />
+  )
+
+  if (variant === 'settings') {
+    return (
+      <div className="space-y-3">
+        <div className="relative h-40 w-full overflow-hidden rounded-2xl bg-muted">
+          {coverUrl ? (
+            <Image src={coverUrl} alt="Cover" fill className="object-cover" />
+          ) : (
+            <div className="h-full w-full bg-gradient-to-br from-muted to-muted-foreground/10" />
+          )}
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={uploading}
+          onClick={() => inputRef.current?.click()}
+        >
+          {uploading ? '…' : changeCoverLabel}
+        </Button>
+        {error && <p className="text-xs text-destructive">{error}</p>}
+        {input}
+      </div>
+    )
+  }
+
   return (
     <div className="relative h-48 w-full sm:h-56 overflow-hidden rounded-2xl bg-muted">
       {coverUrl ? (
@@ -66,13 +103,7 @@ export function CoverUpload({ userId, currentCoverUrl, changeCoverLabel, uploadE
         </span>
       </button>
 
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={handleFileChange}
-      />
+      {input}
 
       {error && (
         <p className="absolute bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-destructive/90 px-2 py-1 text-xs text-destructive-foreground">

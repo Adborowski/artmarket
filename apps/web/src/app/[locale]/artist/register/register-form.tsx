@@ -26,7 +26,7 @@ const schema = z.object({
 
 type Values = z.infer<typeof schema>
 
-export function RegisterArtistForm() {
+export function RegisterArtistForm({ onSuccess }: { onSuccess?: () => void } = {}) {
   const t = useTranslations('artist.register')
   const router = useRouter()
   const [serverError, setServerError] = useState<string | null>(null)
@@ -34,7 +34,11 @@ export function RegisterArtistForm() {
 
   const register = trpc.artist.register.useMutation({
     onSuccess: () => {
-      startTransition(() => router.push('/artworks'))
+      if (onSuccess) {
+        onSuccess()
+      } else {
+        startTransition(() => router.push('/artworks'))
+      }
     },
     onError: () => setServerError(t('error')),
   })

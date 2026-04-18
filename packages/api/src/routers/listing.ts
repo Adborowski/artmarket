@@ -3,6 +3,8 @@ import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { createTRPCRouter, artistProcedure, protectedProcedure, publicProcedure } from '../trpc'
 import { notify } from '../lib/notify'
+import { assertAdmin } from '../lib/assert-admin'
+import { closeListing } from '../lib/close-listing'
 
 const MIN_INCREMENT = 50
 
@@ -107,6 +109,14 @@ export const listingRouter = createTRPCRouter({
           link: `/listings/${input.listingId}`,
         }).catch(() => {})
       }
+    }),
+
+  adminClose: protectedProcedure
+    .input(z.object({ listingId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      assertAdmin(ctx.userId)
+      await closeListing(input.listingId)
+      return { ok: true }
     }),
 
   getBids: publicProcedure

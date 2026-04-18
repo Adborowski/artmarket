@@ -18,9 +18,17 @@
     "changeCover": "Zmień okładkę",
     "uploadError": "Przesyłanie nie powiodło się. Spróbuj ponownie.",
     "contactArtist": "Napisz do artysty",
-    "contactSubject": "Zapytanie — Artmarket"
+    "contactSubject": "Zapytanie — Artmarket",
+    "bioEmpty": "Brak opisu.",
+    "editBio": "Edytuj opis",
+    "bioSaved": "Zapisano",
+    "bioSaving": "Zapisywanie…",
+    "bioPlaceholder": "Opowiedz kupującym o sobie i swojej twórczości…",
+    "save": "Zapisz",
+    "cancel": "Anuluj"
   },
   "nav": {
+    "hello": "cześć, {name}",
     "explore": "Odkryj",
     "artists": "Artyści",
     "sell": "Sprzedaj",
@@ -89,7 +97,9 @@
       "title": "Moje prace",
       "empty": "Nie dodałeś jeszcze żadnych prac.",
       "addNew": "Dodaj pracę",
-      "primaryPhoto": "Zdjęcie główne"
+      "primaryPhoto": "Zdjęcie główne",
+      "completeProfile": "Uzupełnij profil sprzedawcy przed dodaniem prac.",
+      "completeProfileLink": "Przejdź do profilu →"
     },
     "detail": {
       "placeBid": "Licytuj",
@@ -116,7 +126,19 @@
       "save": "Zapisz",
       "saving": "Zapisywanie...",
       "saved": "Zapisano",
-      "error": "Nie udało się zapisać. Spróbuj ponownie."
+      "error": "Nie udało się zapisać. Spróbuj ponownie.",
+      "previewProfile": "Podgląd profilu",
+      "sellerProfileTitle": "Profil sprzedawcy",
+      "sellerProfileDesc": "Twoje bio i zdjęcie okładki są widoczne na Twojej publicznej stronie artysty. IBAN jest używany do wypłat po sprzedaży pracy.",
+      "sellerProfileComplete": "{percent}% ukończony",
+      "bioLabel": "Bio",
+      "bioPlaceholder": "Opowiedz kupującym o sobie i swojej twórczości…",
+      "ibanLabel": "IBAN (do wypłat)",
+      "ibanPlaceholder": "PL61 1090 1014 0000 0712 1981 2874",
+      "ibanHint": "Wymagany do otrzymania środków ze sprzedaży. Nigdy nie jest widoczny publicznie.",
+      "ibanInvalid": "Nieprawidłowy format IBAN.",
+      "paymentTitle": "Płatność",
+      "paymentDesc": "Karta jest obciążana tylko wtedy, gdy wygrasz aukcję."
     }
   },
   "dispute": {
@@ -151,8 +173,8 @@
   },
   "orders": {
     "title": "Zamówienia",
-    "purchases": "Zakupy",
-    "sales": "Sprzedaż",
+    "purchases": "Kupione przez Ciebie",
+    "sales": "Sprzedane przez Ciebie",
     "empty": "Brak zamówień.",
     "statusUnsold": "Niesprzedane",
     "statusPaymentPending": "Oczekiwanie na płatność",
@@ -162,7 +184,26 @@
     "openDispute": "Otwórz spór",
     "viewDispute": "Zobacz spór",
     "soldTo": "Sprzedano do",
-    "noBids": "Brak ofert"
+    "noBids": "Brak ofert",
+    "statusAwaitingShipment": "Oczekiwanie na wysyłkę",
+    "markShippedPrompt": "Oznacz zamówienie jako wysłane po nadaniu paczki.",
+    "carrierPlaceholder": "Przewoźnik — np. DHL, InPost",
+    "trackingNumberPlaceholder": "Numer śledzenia",
+    "guideReminder": "Przed wysyłką zapoznaj się z naszym",
+    "guideReminderLink": "Przewodnikiem bezpiecznej sprzedaży →",
+    "shippingPhotos": "Zdjęcia pakowania",
+    "shippingPhotosHint": "Dodaj zdjęcia pracy i opakowania przed wysyłką. Będą stanowić dowód w razie sporu.",
+    "shippingPhotosAdd": "Dodaj zdjęcia",
+    "shippingPhotosRemove": "Usuń",
+    "shippingPhotosUploadError": "Przesyłanie zdjęcia nie powiodło się. Spróbuj ponownie.",
+    "shippingSubmit": "Oznacz jako wysłane",
+    "shippingSubmitting": "Zapisywanie…",
+    "trackingInfo": "{carrier} — {number}",
+    "awaitingDeliveryConfirmation": "Oczekiwanie na potwierdzenie kupującego",
+    "confirmDelivery": "Potwierdź odbiór",
+    "confirmDeliveryWarning": "Potwierdzenie odbioru przekazuje środki artyście i zamyka transakcję. Potwierdź dopiero po dokładnym sprawdzeniu pracy i upewnieniu się, że wszystko jest w porządku.",
+    "confirmDeliveryConfirm": "Tak, potwierdzam odbiór",
+    "confirmDeliveryCancel": "Anuluj"
   },
   "billing": {
     "cardPrompt": "Dodaj kartę, aby licytować. Płatność zostanie pobrana tylko jeśli wygrasz.",
@@ -222,6 +263,8 @@
       "ownArtwork": "Nie możesz licytować własnej pracy",
       "signInToBid": "Zaloguj się, aby licytować",
       "youAreTopBidder": "Twoja oferta jest najwyższa",
+      "noCard": "Aby licytować, dodaj kartę w swoim",
+      "noCardLink": "profilu →",
       "bids": "Oferty",
       "bidIncrement": "kroki po 50 PLN",
       "realtimeNote": "Włącz Realtime dla tabeli Bid w panelu Supabase, aby otrzymywać aktualizacje na żywo."

@@ -207,8 +207,25 @@ model EscrowPayment {
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
 
-  payout  Payout?
-  dispute Dispute?
+  // Shipment tracking — set by artist after shipping
+  shippedAt      DateTime?
+  carrier        String?   // e.g. "DHL", "InPost"
+  trackingNumber String?
+  // Set when buyer confirms delivery (triggers escrow release)
+  deliveredAt    DateTime?
+
+  shippingPhotos ShippingPhoto[]
+  payout         Payout?
+  dispute        Dispute?
+}
+
+model ShippingPhoto {
+  id              String        @id @default(cuid())
+  escrowPaymentId String
+  escrowPayment   EscrowPayment @relation(fields: [escrowPaymentId], references: [id])
+  storagePath     String
+  order           Int           @default(0)
+  createdAt       DateTime      @default(now())
 }
 
 model Payout {

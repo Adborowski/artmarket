@@ -2,66 +2,43 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/src/i18n/navigation'
-import { getArtistById, getSessionUser } from '@/src/lib/data'
+import { getArtistById } from '@/src/lib/data'
 import { getInstitutionByEmail } from '@artmarket/institutions'
-import { AvatarUpload } from '@/components/avatar-upload'
-import { CoverUpload } from '@/components/cover-upload'
 import { InstitutionBadge } from '@/components/institution-badge'
 import { HeartIcon } from '@/components/heart-icon'
 
 export async function ArtistProfile({ id }: { id: string }) {
-  const [t, tCard, artist, user] = await Promise.all([
+  const [t, tCard, artist] = await Promise.all([
     getTranslations('artists'),
     getTranslations('listing.card'),
     getArtistById(id),
-    getSessionUser(),
   ])
 
   if (!artist) notFound()
 
-  const isOwner = user?.id === artist.userId
   const institution = getInstitutionByEmail(artist.user.email)
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 
   return (
     <>
       {/* Cover photo */}
-      {isOwner ? (
-        <div className="mb-8">
-          <CoverUpload
-            userId={artist.userId}
-            currentCoverUrl={artist.coverUrl}
-            changeCoverLabel={t('changeCover')}
-            uploadErrorLabel={t('uploadError')}
-          />
-        </div>
-      ) : artist.coverUrl ? (
+      {artist.coverUrl && (
         <div className="relative mb-8 h-48 w-full overflow-hidden rounded-2xl sm:h-56">
           <Image src={artist.coverUrl} alt={artist.user.name} fill className="object-cover" />
         </div>
-      ) : null}
+      )}
 
       {/* Header */}
       <div className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-start">
-        {isOwner ? (
-          <AvatarUpload
-            userId={artist.userId}
-            name={artist.user.name}
-            currentAvatarUrl={artist.user.avatarUrl}
-            changePhotoLabel={t('changePhoto')}
-            uploadErrorLabel={t('uploadError')}
-          />
-        ) : (
-          <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-full bg-muted ring-4 ring-border">
-            {artist.user.avatarUrl ? (
-              <Image src={artist.user.avatarUrl} alt={artist.user.name} fill className="object-cover" />
-            ) : (
-              <div className="flex h-full items-center justify-center text-4xl font-bold text-muted-foreground">
-                {artist.user.name[0]}
-              </div>
-            )}
-          </div>
-        )}
+        <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-full bg-muted ring-4 ring-border">
+          {artist.user.avatarUrl ? (
+            <Image src={artist.user.avatarUrl} alt={artist.user.name} fill className="object-cover" />
+          ) : (
+            <div className="flex h-full items-center justify-center text-4xl font-bold text-muted-foreground">
+              {artist.user.name[0]}
+            </div>
+          )}
+        </div>
 
         <div className="flex-1 min-w-0">
           <h1 className="text-3xl font-bold">{artist.user.name}</h1>
@@ -76,14 +53,12 @@ export async function ArtistProfile({ id }: { id: string }) {
               {artist.bio}
             </p>
           )}
-          {!isOwner && (
-            <a
-              href={`mailto:${artist.user.email}?subject=${encodeURIComponent(t('contactSubject'))}`}
-              className="mt-4 inline-flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
-            >
-              {t('contactArtist')}
-            </a>
-          )}
+          <a
+            href={`mailto:${artist.user.email}?subject=${encodeURIComponent(t('contactSubject'))}`}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+          >
+            {t('contactArtist')}
+          </a>
         </div>
       </div>
 

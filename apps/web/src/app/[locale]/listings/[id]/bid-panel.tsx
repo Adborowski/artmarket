@@ -12,7 +12,6 @@ import { trpc } from '@/src/lib/trpc/client'
 import { createClient } from '@/src/lib/supabase/client'
 import { useTranslations } from 'next-intl'
 import { Countdown } from './countdown'
-import { CardSetupForm } from '@/components/card-setup-form'
 
 type Bid = {
   id: string
@@ -56,7 +55,7 @@ export function BidPanel({
     defaultValues: { amount: String(minimumBid) },
   })
 
-  const { data: paymentData, refetch: refetchPayment } = trpc.billing.hasPaymentMethod.useQuery(
+  const { data: paymentData } = trpc.billing.hasPaymentMethod.useQuery(
     undefined,
     { enabled: !!userId },
   )
@@ -141,7 +140,12 @@ export function BidPanel({
         ) : isOwner ? (
           <p className="text-sm text-muted-foreground">{t('ownArtwork')}</p>
         ) : !hasCard ? (
-          <CardSetupForm onSuccess={() => refetchPayment()} />
+          <p className="text-sm text-muted-foreground">
+            {t('noCard')}{' '}
+            <Link href="/account/profile" className="underline underline-offset-2 hover:text-foreground">
+              {t('noCardLink')}
+            </Link>
+          </p>
         ) : isTopBidder ? (
           <div className="space-y-3">
             <Button className="w-full" disabled>{t('submit')}</Button>

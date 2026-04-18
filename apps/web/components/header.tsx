@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server'
+import { db } from '@artmarket/db'
 import { Link } from '@/src/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { signOut } from '@/src/lib/auth/actions'
@@ -10,11 +11,12 @@ import { BellButton } from '@/components/bell-button'
 export async function Header({ locale }: { locale: string }) {
   const user = await getSessionUser()
 
-  const [t, tFeedback, artist, unreadCount] = await Promise.all([
+  const [t, tFeedback, artist, unreadCount, dbUser] = await Promise.all([
     getTranslations('nav'),
     getTranslations('feedback'),
     user ? getArtist(user.id) : Promise.resolve(null),
     user ? getUnreadNotificationCount(user.id) : Promise.resolve(0),
+    user ? db.user.findUnique({ where: { id: user.id }, select: { name: true } }) : Promise.resolve(null),
   ])
   const isArtist = !!artist
   const isAdmin = !!process.env.ADMIN_USER_ID && user?.id === process.env.ADMIN_USER_ID
@@ -32,17 +34,16 @@ export async function Header({ locale }: { locale: string }) {
         </div>
         {user ? (
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/artists">{t('artists')}</Link>
-            </Button>
+            {dbUser?.name && (
+              <span className="text-sm text-muted-foreground hidden sm:inline">
+                {t('hello', { name: dbUser.name.split(' ')[0] ?? dbUser.name })}
+              </span>
+            )}
             {isArtist && (
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/artworks">{t('myArtworks')}</Link>
               </Button>
             )}
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/artworks/new">{t('sell')}</Link>
-            </Button>
             <Button variant="ghost" size="sm" asChild>
               <Link href="/account/orders">{t('orders')}</Link>
             </Button>
@@ -51,7 +52,7 @@ export async function Header({ locale }: { locale: string }) {
             </Button>
             {isAdmin && (
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/admin/disputes">Disputes</Link>
+                <Link href="/admin">Admin</Link>
               </Button>
             )}
             <BellButton initialCount={unreadCount} />
@@ -64,10 +65,6 @@ export async function Header({ locale }: { locale: string }) {
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/artists">{t('artists')}</Link>
-            </Button>
-            <FeedbackModal trigger={<Button variant="ghost" size="sm">{tFeedback('trigger')}</Button>} />
             <Button variant="ghost" size="sm" asChild>
               <Link href="/auth/sign-in">{t('signIn')}</Link>
             </Button>

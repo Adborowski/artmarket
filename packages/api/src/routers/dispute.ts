@@ -4,6 +4,7 @@ import { TRPCError } from '@trpc/server'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 import { notify } from '../lib/notify'
 import { settleDispute } from '../lib/settle-dispute'
+import { assertAdmin } from '../lib/assert-admin'
 
 export type DisputeMessage = {
   id: string
@@ -41,12 +42,6 @@ function assertParticipant(userId: string, buyerId: string, artistUserId: string
   }
 }
 
-function assertAdmin(userId: string) {
-  const adminId = process.env.ADMIN_USER_ID
-  if (!adminId || userId !== adminId) {
-    throw new TRPCError({ code: 'FORBIDDEN' })
-  }
-}
 
 export const disputeRouter = createTRPCRouter({
   // Fetches a dispute by ID. Accessible to the buyer, artist, and admin.

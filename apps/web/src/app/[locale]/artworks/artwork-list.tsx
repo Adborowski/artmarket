@@ -1,32 +1,38 @@
 import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
-import { redirect, Link } from '@/src/i18n/navigation'
+import { Link } from '@/src/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { getArtistWithArtworks } from '@/src/lib/data'
 import { HeartIcon } from '@/components/heart-icon'
 
-export async function ArtworkList({ userId, locale }: { userId: string; locale: string }) {
+export async function ArtworkList({ userId }: { userId: string }) {
   const [t, artist] = await Promise.all([
     getTranslations('artwork.list'),
     getArtistWithArtworks(userId),
   ])
 
-  if (!artist) {
-    redirect({ href: '/artist/register', locale })
-    return null
-  }
-
-  const { artworks } = artist
+  const artworks = artist?.artworks ?? []
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 
   return (
     <>
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-2xl font-bold">{t('title')}</h1>
-        <Button asChild>
-          <Link href="/artworks/new">{t('addNew')}</Link>
-        </Button>
+        {artist && (
+          <Button asChild>
+            <Link href="/artworks/new">{t('addNew')}</Link>
+          </Button>
+        )}
       </div>
+
+      {!artist && (
+        <div className="mb-6 rounded-lg border border-pink-200 bg-pink-50 px-4 py-3 text-sm text-pink-700">
+          {t('completeProfile')}{' '}
+          <Link href="/account/profile" className="font-medium underline underline-offset-2">
+            {t('completeProfileLink')}
+          </Link>
+        </div>
+      )}
 
       {artworks.length === 0 ? (
         <p className="text-muted-foreground">{t('empty')}</p>

@@ -1,4 +1,5 @@
 import { db } from '@artmarket/db'
+import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 import { getStripe } from '../lib/stripe'
@@ -47,21 +48,35 @@ export const billingRouter = createTRPCRouter({
   }),
 
   // Called after Stripe Elements confirms the SetupIntent on the client.
-  // Saves the resulting PaymentMethod ID to the user.
+  // Retrieves the SetupIntent server-side to verify it succeeded and belongs to
+  // this customer — avoids trusting a client-supplied paymentMethodId.
   confirmPaymentMethod: protectedProcedure
-    .input(z.object({ paymentMethodId: z.string() }))
+    .input(z.object({ setupIntentId: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      const stripe = getStripe()
+
       const user = await db.user.findUnique({
         where: { id: ctx.userId },
         select: { stripeCustomerId: true },
       })
-      if (!user?.stripeCustomerId) throw new Error('Stripe customer not initialised')
+      if (!user?.stripeCustomerId) throw new TRPCError({ code: 'BAD_REQUEST', message: 'Stripe customer not initialised' })
+
+      // Retrieve the SetupIntent directly from Stripe — do not trust the client.
+      const setupIntent = await stripe.setupIntents.retrieve(input.setupIntentId)
+
+      if (setupIntent.status !== 'succeeded') {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'SetupIntent has not succeeded' })
+      }
+      if (setupIntent.customer !== user.stripeCustomerId) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'SetupIntent belongs to a different customer' })
+      }
+
+      const paymentMethodId = setupIntent.payment_method as string
 
       // Attach to customer so it can be used off-session.
       // Ignore "already attached" errors — safe to call multiple times.
-      const stripe = getStripe()
       try {
-        await stripe.paymentMethods.attach(input.paymentMethodId, {
+        await stripe.paymentMethods.attach(paymentMethodId, {
           customer: user.stripeCustomerId,
         })
       } catch (err: unknown) {
@@ -73,7 +88,7 @@ export const billingRouter = createTRPCRouter({
 
       await db.user.update({
         where: { id: ctx.userId },
-        data: { stripePaymentMethodId: input.paymentMethodId },
+        data: { stripePaymentMethodId: paymentMethodId },
       })
 
       return { ok: true }
