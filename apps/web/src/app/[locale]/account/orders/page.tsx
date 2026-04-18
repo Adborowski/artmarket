@@ -7,8 +7,6 @@ import { MarkShippedForm } from './mark-shipped-form'
 import { ConfirmDeliveryButton } from './confirm-delivery-button'
 import { getTrackingUrl } from '@/src/lib/tracking'
 
-type Tab = 'purchases' | 'sales'
-
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 
 function TrackingLine({ carrier, trackingNumber, suffix }: { carrier: string; trackingNumber: string; suffix?: React.ReactNode }) {
@@ -67,16 +65,108 @@ const statusColors: Record<string, string> = {
   statusComplete: 'bg-green-100 text-green-800',
 }
 
+type Order = Awaited<ReturnType<typeof getPurchases>>[number]
+
+function OrderCard({ order, isSale, userId, t }: {
+  order: Order
+  isSale: boolean
+  userId: string
+  t: Awaited<ReturnType<typeof getTranslations<'orders'>>>
+}) {
+  const photo = order.artwork.photos[0]
+  const imgSrc = photo ? `${supabaseUrl}/storage/v1/object/public/artworks/${photo.storagePath}` : null
+  const sk = statusKey(order)
+  const amount = order.winningBid ? Number(order.winningBid.amount) : null
+  const escrow = order.escrowPayment
+  const isHeld = escrow?.status === 'HELD'
+  const hasDispute = !!escrow?.dispute
+  const isShipped = !!escrow?.shippedAt
+
+  return (
+    <li className="rounded-lg border p-4 space-y-3">
+      <div className="flex items-center gap-4">
+        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
+          {imgSrc && <Image src={imgSrc} alt={order.artwork.title} fill className="object-cover" />}
+        </div>
+        <div className="min-w-0 flex-1 space-y-0.5">
+          <p className="truncate font-medium">{order.artwork.title}</p>
+          {isSale && order.winningBid ? (
+            <p className="text-sm text-muted-foreground">{t('soldTo')}: {order.winningBid.bidder.name}</p>
+          ) : !isSale ? (
+            <p className="text-sm text-muted-foreground">{order.artwork.artist.user.name}</p>
+          ) : null}
+          {amount !== null && (
+            <p className="text-sm font-semibold">{amount.toLocaleString('pl-PL')} PLN</p>
+          )}
+        </div>
+        <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[sk]}`}>
+          {t(sk as Parameters<typeof t>[0])}
+        </span>
+      </div>
+
+      {escrow && isHeld && (
+        <div className="border-t pt-3 text-sm space-y-2">
+          {isSale ? (
+            isShipped ? (
+              <div className="space-y-2">
+                <TrackingLine
+                  carrier={escrow.carrier!}
+                  trackingNumber={escrow.trackingNumber!}
+                  suffix={<>{' · '}<span className="italic">{t('awaitingDeliveryConfirmation')}</span></>}
+                />
+                <ShippingPhotoGrid photos={escrow.shippingPhotos} />
+              </div>
+            ) : (
+              <div>
+                <p className="text-muted-foreground mb-1">{t('markShippedPrompt')}</p>
+                <MarkShippedForm escrowPaymentId={escrow.id} userId={userId} />
+              </div>
+            )
+          ) : (
+            isShipped ? (
+              <div className="space-y-2">
+                <TrackingLine carrier={escrow.carrier!} trackingNumber={escrow.trackingNumber!} />
+                <ShippingPhotoGrid photos={escrow.shippingPhotos} />
+                {!hasDispute && <ConfirmDeliveryButton escrowPaymentId={escrow.id} />}
+              </div>
+            ) : (
+              <p className="text-muted-foreground">{t('statusAwaitingShipment')}</p>
+            )
+          )}
+
+          {hasDispute ? (
+            <Link
+              href={`/account/disputes/${escrow.dispute!.id}` as Parameters<typeof Link>[0]['href']}
+              className="text-xs underline underline-offset-2 text-muted-foreground"
+            >
+              {t('viewDispute')}
+            </Link>
+          ) : (
+            !isSale && isShipped && <OpenDisputeButton escrowPaymentId={escrow.id} />
+          )}
+        </div>
+      )}
+
+      {escrow && !isHeld && escrow.dispute && (
+        <div className="border-t pt-3">
+          <Link
+            href={`/account/disputes/${escrow.dispute.id}` as Parameters<typeof Link>[0]['href']}
+            className="text-xs underline underline-offset-2 text-muted-foreground"
+          >
+            {t('viewDispute')}
+          </Link>
+        </div>
+      )}
+    </li>
+  )
+}
+
 export default async function OrdersPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ locale: string }>
-  searchParams: Promise<{ tab?: string }>
 }) {
   const { locale } = await params
-  const { tab } = await searchParams
-  const activeTab: Tab = tab === 'sales' ? 'sales' : 'purchases'
 
   const user = await getSessionUser()
   if (!user) {
@@ -91,144 +181,38 @@ export default async function OrdersPage({
     getArtist(user.id).then((a) => (a ? getSales(user.id) : [])),
   ])
 
-  const orders = activeTab === 'purchases' ? purchases : sales
-  const isSalesTab = activeTab === 'sales'
-
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="mb-6 text-2xl font-bold">{t('title')}</h1>
+    <main className="mx-auto max-w-3xl px-4 py-10 space-y-10">
+      <h1 className="text-2xl font-bold">{t('title')}</h1>
 
-      {/* Tabs */}
-      <div className="mb-6 flex gap-1 rounded-lg border p-1 w-fit">
-        {(['purchases', 'sales'] as const).map((tabName) => (
-          <Link
-            key={tabName}
-            href={tabName === 'purchases' ? '/account/orders' : '/account/orders?tab=sales'}
-            className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
-              activeTab === tabName
-                ? 'bg-foreground text-background'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            {t(tabName)}
-          </Link>
-        ))}
-      </div>
+      {/* Purchases */}
+      <section>
+        <h2 className="mb-4 text-lg font-semibold">{t('purchases')}</h2>
+        {purchases.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{t('empty')}</p>
+        ) : (
+          <ul className="space-y-4">
+            {purchases.map((order) => (
+              <OrderCard key={order.id} order={order} isSale={false} userId={user.id} t={t} />
+            ))}
+          </ul>
+        )}
+      </section>
 
-      {/* Sales tab only visible to artists */}
-      {isSalesTab && !artist ? (
-        <p className="text-sm text-muted-foreground">{t('empty')}</p>
-      ) : orders.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t('empty')}</p>
-      ) : (
-        <ul className="space-y-4">
-          {orders.map((order) => {
-            const photo = order.artwork.photos[0]
-            const imgSrc = photo
-              ? `${supabaseUrl}/storage/v1/object/public/artworks/${photo.storagePath}`
-              : null
-            const sk = statusKey(order)
-            const amount = order.winningBid ? Number(order.winningBid.amount) : null
-            const escrow = order.escrowPayment
-            const isHeld = escrow?.status === 'HELD'
-            const hasDispute = !!escrow?.dispute
-            const isShipped = !!escrow?.shippedAt
-
-            return (
-              <li key={order.id} className="rounded-lg border p-4 space-y-3">
-                {/* Top row: thumbnail + info + badge */}
-                <div className="flex items-center gap-4">
-                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
-                    {imgSrc && (
-                      <Image src={imgSrc} alt={order.artwork.title} fill className="object-cover" />
-                    )}
-                  </div>
-
-                  <div className="min-w-0 flex-1 space-y-0.5">
-                    <p className="truncate font-medium">{order.artwork.title}</p>
-                    {isSalesTab && order.winningBid ? (
-                      <p className="text-sm text-muted-foreground">
-                        {t('soldTo')}: {order.winningBid.bidder.name}
-                      </p>
-                    ) : !isSalesTab ? (
-                      <p className="text-sm text-muted-foreground">
-                        {order.artwork.artist.user.name}
-                      </p>
-                    ) : null}
-                    {amount !== null && (
-                      <p className="text-sm font-semibold">{amount.toLocaleString('pl-PL')} PLN</p>
-                    )}
-                  </div>
-
-                  <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[sk]}`}>
-                    {t(sk as Parameters<typeof t>[0])}
-                  </span>
-                </div>
-
-                {/* Shipment section */}
-                {escrow && isHeld && (
-                  <div className="border-t pt-3 text-sm space-y-2">
-                    {isSalesTab ? (
-                      /* Seller view */
-                      isShipped ? (
-                        <div className="space-y-2">
-                          <TrackingLine
-                            carrier={escrow.carrier!}
-                            trackingNumber={escrow.trackingNumber!}
-                            suffix={<>{' · '}<span className="italic">{t('awaitingDeliveryConfirmation')}</span></>}
-                          />
-                          <ShippingPhotoGrid photos={escrow.shippingPhotos} />
-                        </div>
-                      ) : (
-                        <div>
-                          <p className="text-muted-foreground mb-1">{t('markShippedPrompt')}</p>
-                          <MarkShippedForm escrowPaymentId={escrow.id} userId={user.id} />
-                        </div>
-                      )
-                    ) : (
-                      /* Buyer view */
-                      isShipped ? (
-                        <div className="space-y-2">
-                          <TrackingLine carrier={escrow.carrier!} trackingNumber={escrow.trackingNumber!} />
-                          <ShippingPhotoGrid photos={escrow.shippingPhotos} />
-                          {!hasDispute && <ConfirmDeliveryButton escrowPaymentId={escrow.id} />}
-                        </div>
-                      ) : (
-                        <p className="text-muted-foreground">{t('statusAwaitingShipment')}</p>
-                      )
-                    )}
-
-                    {/* Dispute actions */}
-                    {hasDispute ? (
-                      <Link
-                        href={`/account/disputes/${escrow.dispute!.id}` as Parameters<typeof Link>[0]['href']}
-                        className="text-xs underline underline-offset-2 text-muted-foreground"
-                      >
-                        {t('viewDispute')}
-                      </Link>
-                    ) : (
-                      !isSalesTab && isShipped && (
-                        <OpenDisputeButton escrowPaymentId={escrow.id} />
-                      )
-                    )}
-                  </div>
-                )}
-
-                {/* Completed / dispute view for non-HELD states */}
-                {escrow && !isHeld && escrow.dispute && (
-                  <div className="border-t pt-3">
-                    <Link
-                      href={`/account/disputes/${escrow.dispute.id}` as Parameters<typeof Link>[0]['href']}
-                      className="text-xs underline underline-offset-2 text-muted-foreground"
-                    >
-                      {t('viewDispute')}
-                    </Link>
-                  </div>
-                )}
-              </li>
-            )
-          })}
-        </ul>
+      {/* Sales — artists only */}
+      {artist && (
+        <section>
+          <h2 className="mb-4 text-lg font-semibold">{t('sales')}</h2>
+          {sales.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t('empty')}</p>
+          ) : (
+            <ul className="space-y-4">
+              {sales.map((order) => (
+                <OrderCard key={order.id} order={order} isSale={true} userId={user.id} t={t} />
+              ))}
+            </ul>
+          )}
+        </section>
       )}
     </main>
   )

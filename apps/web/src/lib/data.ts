@@ -65,7 +65,7 @@ export const getActiveListings = cache(async () => {
       bids: {
         orderBy: { amount: 'desc' },
         take: 1,
-        select: { amount: true },
+        select: { amount: true, bidderId: true },
       },
       artwork: {
         select: {
@@ -81,6 +81,54 @@ export const getActiveListings = cache(async () => {
       },
     },
   })
+})
+
+export const getArtworkHistory = cache(async (artworkId: string) => {
+  return db.auctionListing.findMany({
+    where: { artworkId },
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      status: true,
+      startPrice: true,
+      reservePrice: true,
+      startsAt: true,
+      endsAt: true,
+      closedAt: true,
+      bids: {
+        orderBy: { amount: 'desc' },
+        select: {
+          id: true,
+          amount: true,
+          createdAt: true,
+          isWinning: true,
+          bidder: { select: { name: true } },
+        },
+      },
+      escrowPayment: {
+        select: {
+          status: true,
+          amount: true,
+          commissionAmount: true,
+          shippedAt: true,
+          carrier: true,
+          trackingNumber: true,
+          deliveredAt: true,
+          createdAt: true,
+          payout: { select: { status: true } },
+        },
+      },
+    },
+  })
+})
+
+export const getUserBidListingIds = cache(async (userId: string) => {
+  const bids = await db.bid.findMany({
+    where: { bidderId: userId, listing: { status: 'ACTIVE' } },
+    select: { listingId: true },
+    distinct: ['listingId'],
+  })
+  return new Set(bids.map((b) => b.listingId))
 })
 
 export const getAllArtworks = cache(async () => {
@@ -228,6 +276,14 @@ export const getArtistWithArtworks = cache(async (userId: string) => {
             select: { storagePath: true },
           },
           _count: { select: { interests: true } },
+          listings: {
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+            select: {
+              status: true,
+              escrowPayment: { select: { status: true } },
+            },
+          },
         },
       },
     },

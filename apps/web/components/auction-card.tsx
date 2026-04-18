@@ -12,7 +12,8 @@ type AuctionCardProps = {
   endsAt: Date
   supabaseUrl: string
   likeCount: number
-  labels: { currentBid: string; startingAt: string; live: string; ending: string }
+  labels: { currentBid: string; startingAt: string; live: string; ending: string; topBidder: string; outbid: string }
+  bidStatus: 'top' | 'outbid' | null
 }
 
 function formatTimeLeft(endsAt: Date, endingLabel: string): { label: string; urgent: boolean } {
@@ -41,6 +42,7 @@ export function AuctionCard({
   supabaseUrl,
   likeCount,
   labels,
+  bidStatus,
 }: AuctionCardProps) {
   const { label, urgent } = formatTimeLeft(endsAt, labels.ending)
   const displayPrice = currentBid ?? startPrice
@@ -97,6 +99,15 @@ export function AuctionCard({
             </span>
           )}
         </div>
+        {bidStatus && (
+          <div className={`mt-2 rounded-md px-2 py-1 text-xs font-medium text-center ${
+            bidStatus === 'top'
+              ? 'bg-green-50 text-green-700'
+              : 'bg-orange-50 text-orange-700'
+          }`}>
+            {bidStatus === 'top' ? labels.topBidder : labels.outbid}
+          </div>
+        )}
       </div>
     </Link>
   )

@@ -44,6 +44,14 @@ export async function ArtworkList({ userId }: { userId: string }) {
               ? `${supabaseUrl}/storage/v1/object/public/artworks/${primaryPhoto.storagePath}`
               : null
 
+            const listing = artwork.listings[0] ?? null
+            const badge = (() => {
+              if (!listing) return null
+              if (listing.status === 'ACTIVE') return { label: t('badgeInAuction'), className: 'bg-blue-100 text-blue-700' }
+              if (listing.escrowPayment) return { label: t('badgeSold'), className: 'bg-green-100 text-green-700' }
+              return { label: t('badgeNoSale'), className: 'bg-muted text-muted-foreground' }
+            })()
+
             return (
               <Link
                 key={artwork.id}
@@ -57,6 +65,11 @@ export async function ArtworkList({ userId }: { userId: string }) {
                     <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
                       No photo
                     </div>
+                  )}
+                  {badge && (
+                    <span className={`absolute bottom-2 left-2 rounded-full px-2 py-0.5 text-xs font-medium ${badge.className}`}>
+                      {badge.label}
+                    </span>
                   )}
                 </div>
                 <div className="p-3">

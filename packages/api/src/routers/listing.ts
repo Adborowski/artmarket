@@ -14,7 +14,7 @@ export const listingRouter = createTRPCRouter({
       artworkId: z.string(),
       startPrice: z.number().int().positive(),
       reservePrice: z.number().int().positive().optional(),
-      durationDays: z.union([z.literal(7), z.literal(14), z.literal(30)]),
+      durationDays: z.union([z.literal(1), z.literal(7), z.literal(14), z.literal(30)]),
     }))
     .mutation(async ({ ctx, input }) => {
       const artwork = await db.artwork.findUnique({ where: { id: input.artworkId }, select: { artistId: true } })
@@ -30,11 +30,11 @@ export const listingRouter = createTRPCRouter({
         where: {
           artworkId: input.artworkId,
           status: 'ENDED',
-          escrowPayment: { status: { in: ['HELD', 'DISPUTED'] } },
+          escrowPayment: { status: { in: ['HELD', 'DISPUTED', 'RELEASED'] } },
         },
         select: { id: true },
       })
-      if (escrowBlock) throw new TRPCError({ code: 'CONFLICT', message: 'Cannot relist while payment is in escrow' })
+      if (escrowBlock) throw new TRPCError({ code: 'CONFLICT', message: 'Cannot relist a sold artwork' })
 
       const now = new Date()
       const endsAt = new Date(now)

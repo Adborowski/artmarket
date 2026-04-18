@@ -54,6 +54,14 @@ export async function closeListing(listingId: string): Promise<void> {
       body: `Twoja oferta ${Number(winningBid.amount).toLocaleString('pl-PL')} PLN na „${artworkTitle}" wygrała. Oczekuj na kontakt od artysty.`,
       link: `/listings/${listingId}`,
     }).catch(() => {})
+    // Notify artist their artwork sold
+    notify({
+      userId: artistUserId,
+      type: 'AUCTION_WON',
+      title: 'Praca sprzedana!',
+      body: `Aukcja „${artworkTitle}" zakończyła się sprzedażą za ${Number(winningBid.amount).toLocaleString('pl-PL')} PLN. Wyślij pracę do kupującego.`,
+      link: `/account/orders`,
+    }).catch(() => {})
   } else {
     // Notify artist their auction ended without a sale
     notify({

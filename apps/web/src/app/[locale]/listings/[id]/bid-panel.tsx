@@ -55,7 +55,7 @@ export function BidPanel({
     defaultValues: { amount: String(minimumBid) },
   })
 
-  const { data: paymentData } = trpc.billing.hasPaymentMethod.useQuery(
+  const { data: paymentData, isLoading: cardLoading } = trpc.billing.hasPaymentMethod.useQuery(
     undefined,
     { enabled: !!userId },
   )
@@ -139,6 +139,11 @@ export function BidPanel({
           </Button>
         ) : isOwner ? (
           <p className="text-sm text-muted-foreground">{t('ownArtwork')}</p>
+        ) : cardLoading ? (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+            {t('checkingCard')}
+          </div>
         ) : !hasCard ? (
           <p className="text-sm text-muted-foreground">
             {t('noCard')}{' '}
@@ -170,7 +175,9 @@ export function BidPanel({
             </div>
             {bidError && <p className="text-sm text-destructive">{bidError}</p>}
             <Button type="submit" className="w-full" disabled={placeBid.isPending || isPending}>
-              {t('submit')}
+              {(placeBid.isPending || isPending) ? (
+                <><span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />{t('bidding')}</>
+              ) : t('submit')}
             </Button>
           </form>
         )}

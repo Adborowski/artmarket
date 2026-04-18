@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server'
 import { Link } from '@/src/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { getArtworkById, getSessionUser, getArtworkInterestForUser, getArtworkEscrowBlock } from '@/src/lib/data'
+import { ArtworkHistory } from './artwork-history'
 import { deleteArtwork } from '@/src/lib/artwork/actions'
 import { DeleteArtworkButton } from '@/components/delete-artwork-button'
 import { ArtistBanner } from '@/components/artist-banner'
@@ -30,6 +31,7 @@ export async function ArtworkDetail({ id, locale }: { id: string; locale: string
   ])
 
   return (
+    <div className="space-y-10">
     <div className="grid gap-10 md:grid-cols-2">
       {/* Photo */}
       <div className="space-y-2">
@@ -116,7 +118,12 @@ export async function ArtworkDetail({ id, locale }: { id: string; locale: string
                   </Button>
                 </div>
               ) : escrowBlock ? (
-                <p className="text-sm text-muted-foreground">{t('escrowPending')}</p>
+                <div className="rounded-md border border-green-200 bg-green-50 px-4 py-3 space-y-2">
+                  <p className="text-sm font-medium text-green-900">{t('auctionClosedShipPrompt')}</p>
+                  <Button asChild size="sm" className="w-full">
+                    <Link href="/account/orders">{t('goToOrders')}</Link>
+                  </Button>
+                </div>
               ) : (
                 <div className="space-y-3">
                   <DeleteArtworkButton
@@ -153,6 +160,9 @@ export async function ArtworkDetail({ id, locale }: { id: string; locale: string
           )}
         </div>
       </div>
+    </div>
+
+    {isOwner && <ArtworkHistory artworkId={artwork.id} />}
     </div>
   )
 }

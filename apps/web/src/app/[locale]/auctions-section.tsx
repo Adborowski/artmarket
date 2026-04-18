@@ -1,15 +1,18 @@
 import { getTranslations } from 'next-intl/server'
-import { getActiveListings } from '@/src/lib/data'
+import { getActiveListings, getUserBidListingIds, getSessionUser } from '@/src/lib/data'
 import { AuctionCard } from '@/components/auction-card'
 
 export async function AuctionsSection() {
-  const [t, tHome, listings] = await Promise.all([
+  const [t, tHome, listings, user] = await Promise.all([
     getTranslations('listing.card'),
     getTranslations('home'),
     getActiveListings(),
+    getSessionUser(),
   ])
 
   if (listings.length === 0) return null
+
+  const userBidListingIds = user ? await getUserBidListingIds(user.id) : new Set<string>()
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const labels = {
@@ -17,6 +20,8 @@ export async function AuctionsSection() {
     startingAt: t('startingAt'),
     live: t('live'),
     ending: t('ending'),
+    topBidder: t('topBidder'),
+    outbid: t('outbid'),
   }
 
   return (
@@ -26,6 +31,9 @@ export async function AuctionsSection() {
         {listings.map((listing) => {
           const photo = listing.artwork.photos[0]
           const highestBid = listing.bids[0]
+          const hasBid = userBidListingIds.has(listing.id)
+          const isTop = hasBid && !!user && highestBid?.bidderId === user.id
+          const bidStatus = !hasBid ? null : isTop ? 'top' : 'outbid'
 
           return (
             <AuctionCard
@@ -40,6 +48,7 @@ export async function AuctionsSection() {
               supabaseUrl={supabaseUrl}
               likeCount={listing.artwork._count.interests}
               labels={labels}
+              bidStatus={bidStatus}
             />
           )
         })}
