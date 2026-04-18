@@ -29,6 +29,9 @@ packages/db/generated
 *.pem
 Thumbs.db
 
+# Local notes
+COMMANDS.md
+
 # Editor
 .vscode/*
 !.vscode/extensions.json
