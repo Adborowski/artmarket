@@ -7,6 +7,7 @@ import { getSessionUser, getArtist, getUnreadNotificationCount } from '@/src/lib
 import { NavigationIndicator } from '@/components/navigation-indicator'
 import { FeedbackModal } from '@/components/feedback-modal'
 import { BellButton } from '@/components/bell-button'
+import { LocaleSwitcher } from '@/components/locale-switcher'
 
 export async function Header({ locale }: { locale: string }) {
   const user = await getSessionUser()
@@ -65,12 +66,14 @@ export async function Header({ locale }: { locale: string }) {
                 {t('signOut')}
               </Button>
             </form>
+            <LocaleSwitcher />
           </div>
         ) : (
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" asChild>
               <Link href="/auth/sign-in">{t('signIn')}</Link>
             </Button>
+            <LocaleSwitcher />
           </div>
         )}
       </div>
