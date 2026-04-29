@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import { setRequestLocale } from 'next-intl/server'
 
 export const metadata: Metadata = {
-  title: 'Przewodnik bezpiecznej sprzedaży — Artmarket',
-  description: 'Jak działa ochrona artystów i kupujących na Artmarket. System depozytowy, śledzenie przesyłek i rozwiązywanie sporów.',
+  title: 'Przewodnik bezpiecznej sprzedaży — ASP-DA',
+  description: 'Jak działa ochrona artystów i kupujących na ASP-DA. System depozytowy, śledzenie przesyłek i rozwiązywanie sporów.',
 }
 
 export default async function GuidePage({ params }: { params: Promise<{ locale: string }> }) {
@@ -13,10 +13,10 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
   return (
     <main className="mx-auto max-w-3xl px-4 py-12">
       <div className="mb-10">
-        <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">Artmarket</p>
+        <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">ASP-DA</p>
         <h1 className="mt-2 text-4xl">Przewodnik bezpiecznej sprzedaży</h1>
         <p className="mt-4 text-lg text-muted-foreground">
-          Sprzedaż oryginalnych dzieł sztuki online wymaga wzajemnego zaufania. Ten przewodnik wyjaśnia, jak Artmarket chroni zarówno artystów, jak i kupujących — od momentu złożenia pierwszej oferty do chwili, gdy praca trafia na właściwą ścianę.
+          Sprzedaż oryginalnych dzieł sztuki online wymaga wzajemnego zaufania. Ten przewodnik wyjaśnia, jak ASP-DA chroni zarówno artystów, jak i kupujących — od momentu złożenia pierwszej oferty do chwili, gdy praca trafia na właściwą ścianę.
         </p>
       </div>
 
@@ -30,7 +30,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
           <div>
             <h3 className="mb-2 text-lg font-semibold">Twoje pieniądze są zabezpieczone zanim wyślesz pracę</h3>
             <p className="text-muted-foreground leading-relaxed">
-              Gdy aukcja się kończy i kupujący wygrywa, środki są natychmiast pobierane z jego karty i trafiają na rachunek depozytowy — nie do Artmarket, lecz do zabezpieczonego rachunku obsługiwanego przez Stripe. Zanim wyślesz pracę, wiesz, że pieniądze już czekają. Nie ma ryzyka, że kupujący zniknie po licytacji.
+              Gdy aukcja się kończy i kupujący wygrywa, środki są natychmiast pobierane z jego karty i trafiają na rachunek depozytowy — nie do ASP-DA, lecz do zabezpieczonego rachunku obsługiwanego przez Stripe. Zanim wyślesz pracę, wiesz, że pieniądze już czekają. Nie ma ryzyka, że kupujący zniknie po licytacji.
             </p>
           </div>
 
@@ -58,7 +58,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
           <div>
             <h3 className="mb-2 text-lg font-semibold">Kiedy otrzymujesz pieniądze</h3>
             <p className="text-muted-foreground leading-relaxed">
-              Po potwierdzeniu dostarczenia przez kuriera kupujący ma 7 dni na zgłoszenie ewentualnego sporu. Jeśli w tym czasie żaden spór nie zostanie otwarty, środki są automatycznie przekazywane na twoje konto, pomniejszone o prowizję Artmarket. Nie musisz o nic prosić ani niczego potwierdzać — system działa automatycznie.
+              Po potwierdzeniu dostarczenia przez kuriera kupujący ma 7 dni na zgłoszenie ewentualnego sporu. Jeśli w tym czasie żaden spór nie zostanie otwarty, środki są automatycznie przekazywane na twoje konto, pomniejszone o prowizję ASP-DA. Nie musisz o nic prosić ani niczego potwierdzać — system działa automatycznie.
             </p>
           </div>
         </div>
@@ -88,7 +88,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
           <div>
             <h3 className="mb-2 text-lg font-semibold">Co się dzieje podczas sporu</h3>
             <p className="text-muted-foreground leading-relaxed">
-              Środki pozostają zablokowane na rachunku depozytowym przez cały czas trwania sporu — żadna ze stron nie ma do nich dostępu. Artmarket bada sprawę, weryfikując dane śledzenia przesyłki, zdjęcia z pakowania i korespondencję między stronami. Decyzja jest oparta na faktach, nie na samych oświadczeniach.
+              Środki pozostają zablokowane na rachunku depozytowym przez cały czas trwania sporu — żadna ze stron nie ma do nich dostępu. ASP-DA bada sprawę, weryfikując dane śledzenia przesyłki, zdjęcia z pakowania i korespondencję między stronami. Decyzja jest oparta na faktach, nie na samych oświadczeniach.
             </p>
           </div>
         </div>
@@ -129,7 +129,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
       <section className="mb-12">
         <h2 className="mb-6 text-2xl">Nasze zobowiązanie</h2>
         <p className="text-muted-foreground leading-relaxed mb-4">
-          Artmarket powstał z myślą o artystach. Wierzymy, że tworzenie sztuki to ciężka praca, która zasługuje na uczciwe wynagrodzenie i ochronę przed nadużyciami. Dlatego każdy element systemu — od wymogu karty przed licytacją, przez rachunek depozytowy, po śledzenie przesyłek — jest zaprojektowany tak, żeby artysta nigdy nie musiał wysyłać pracy i czekać w niepewności.
+          ASP-DA powstał z myślą o artystach. Wierzymy, że tworzenie sztuki to ciężka praca, która zasługuje na uczciwe wynagrodzenie i ochronę przed nadużyciami. Dlatego każdy element systemu — od wymogu karty przed licytacją, przez rachunek depozytowy, po śledzenie przesyłek — jest zaprojektowany tak, żeby artysta nigdy nie musiał wysyłać pracy i czekać w niepewności.
         </p>
         <p className="text-muted-foreground leading-relaxed">
           Jeśli masz pytania dotyczące bezpieczeństwa transakcji lub chcesz zgłosić problem, skontaktuj się z nami przez panel sporu lub napisz bezpośrednio na adres podany w stopce.

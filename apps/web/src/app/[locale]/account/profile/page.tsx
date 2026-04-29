@@ -97,7 +97,7 @@ export default async function ProfilePage({
           {tNav('myArtworks')} →
         </Link>
         <Link
-          href="/orders"
+          href="/account/orders"
           className="flex-1 rounded-lg border px-4 py-3 text-sm font-medium hover:bg-accent transition-colors"
         >
           {tNav('orders')} →

@@ -32,6 +32,7 @@ Thumbs.db
 # Local notes
 COMMANDS.md
 ALPHA_TEST.md
+email-*
 
 # Editor
 .vscode/*

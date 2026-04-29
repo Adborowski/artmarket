@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, setRequestLocale } from 'next-intl/server'
-import { Inter } from 'next/font/google'
 import localFont from 'next/font/local'
 import { routing } from '@/src/i18n/routing'
 import { TRPCProvider } from '@/src/lib/trpc/provider'
@@ -9,21 +8,19 @@ import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import '@/src/app/globals.css'
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-geist-sans' })
-
-const basteleur = localFont({
+const roobert = localFont({
   src: [
-    { path: '../../../../../packages/fonts/Basteleur-Bold.woff2', weight: '700', style: 'normal' },
-    { path: '../../../../../packages/fonts/Basteleur-Bold.woff', weight: '700', style: 'normal' },
-    { path: '../../../../../packages/fonts/Basteleur-Moonlight.woff2', weight: '400', style: 'normal' },
-    { path: '../../../../../packages/fonts/Basteleur-Moonlight.woff', weight: '400', style: 'normal' },
+    { path: '../../../../../packages/fonts/Roobert Latin Proportional/Roobert-TRIAL-Regular.woff2', weight: '400', style: 'normal' },
+    { path: '../../../../../packages/fonts/Roobert Latin Proportional/Roobert-TRIAL-Medium.woff2', weight: '500', style: 'normal' },
+    { path: '../../../../../packages/fonts/Roobert Latin Proportional/Roobert-TRIAL-SemiBold.woff2', weight: '600', style: 'normal' },
+    { path: '../../../../../packages/fonts/Roobert Latin Proportional/Roobert-TRIAL-Bold.woff2', weight: '700', style: 'normal' },
   ],
-  variable: '--font-basteleur',
+  variable: '--font-roobert',
   display: 'swap',
 })
 
 export const metadata: Metadata = {
-  title: 'Artmarket',
+  title: 'ASP-DA',
   description: 'Auctions for original artwork by emerging artists.',
 }
 
@@ -44,8 +41,8 @@ export default async function LocaleLayout({
   const messages = await getMessages()
 
   return (
-    <html lang={locale} className={`${inter.variable} ${basteleur.variable}`}>
-      <body className={inter.className}>
+    <html lang={locale} className={roobert.variable}>
+      <body className={roobert.className}>
         <NextIntlClientProvider messages={messages}>
           <TRPCProvider>
             <Header locale={locale} />

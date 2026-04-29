@@ -18,7 +18,7 @@
     "changeCover": "Zmień okładkę",
     "uploadError": "Przesyłanie nie powiodło się. Spróbuj ponownie.",
     "contactArtist": "Napisz do artysty",
-    "contactSubject": "Zapytanie — Artmarket",
+    "contactSubject": "Zapytanie — ASP-DA",
     "bioEmpty": "Brak opisu.",
     "editBio": "Edytuj opis",
     "bioSaved": "Zapisano",
@@ -149,6 +149,7 @@
     "profile": {
       "title": "Profil",
       "nameLabel": "Imię i nazwisko",
+      "nameReadOnly": "Aby zmienić imię i nazwisko, skontaktuj się z pomocą techniczną.",
       "save": "Zapisz",
       "saving": "Zapisywanie...",
       "saved": "Zapisano",

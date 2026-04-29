@@ -26,10 +26,13 @@ export async function Header({ locale }: { locale: string }) {
   return (
     <header className="border-b">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-        <div className="flex items-center gap-2">
-          <Link href="/" className="font-basteleur text-lg tracking-wide">
-            Artmarket
+        <div className="flex items-center gap-4">
+          <Link href="/" className="text-lg font-bold tracking-wide">
+            ASP-DA
           </Link>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/">{t('explore')}</Link>
+          </Button>
           <NavigationIndicator />
         </div>
         {user ? (
